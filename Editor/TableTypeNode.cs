@@ -10,12 +10,12 @@ namespace cfeditor
     public class TableTypeNode: Node
     {
 
-        public ScriptableObject target
+        public object target
         {
             get { return m_target; }
         }
 
-        public TableTypeNode(int id, NodeEditorWindow parent, ScriptableObject target):base(id, parent)
+        public TableTypeNode(int id, NodeEditorWindow parent, object target):base(id, parent)
         {
             m_target = target;
         }
@@ -24,8 +24,7 @@ namespace cfeditor
 
         public override void OnDrawGUI()
         {
-            var datafield = m_target.GetType().GetField("data");
-            if (datafield == null)
+            if (m_target == null)
                 return;
 
             foreach (var node in m_childrenByField)
@@ -36,17 +35,14 @@ namespace cfeditor
                     break;
                 }
             }
+            
 
-
-            var dataType = datafield.FieldType;
-            var dataValue = datafield.GetValue(m_target);
-
-            var fieldsList = dataType.GetFields();
+            var fieldsList = m_target.GetType().GetFields();
 
             for (int i = 0; i < fieldsList.Length; i++)
             {
                 var fieldInfo = fieldsList[i];
-                var fieldValue = fieldInfo.GetValue(dataValue);
+                var fieldValue = fieldInfo.GetValue(m_target);
 
                 bool bchanged = false;
                 object newValue = null;
@@ -55,7 +51,7 @@ namespace cfeditor
                 {
                     if (hasChanged)
                     {
-                        fieldInfo.SetValue(dataValue, newValue);
+                        fieldInfo.SetValue(m_target, newValue);
                         SetChanged();
                     }
                 }
@@ -91,15 +87,9 @@ namespace cfeditor
 
 
             }
-
-            if (hasChanged)
-            {
-                EditorUtility.SetDirty(m_target);
-            }
-
         }
         
-        ScriptableObject m_target;
+        object m_target;
 
         Dictionary<FieldInfo, Node> m_childrenByField = new Dictionary<FieldInfo, Node>();
     }

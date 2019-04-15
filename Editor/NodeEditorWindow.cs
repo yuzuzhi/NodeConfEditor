@@ -18,10 +18,11 @@ namespace cfeditor
             Self = GetWindow<NodeEditorWindow>();
             Self.Show(true);
             Self.nodeWnd = new List<Node>();
-            var data = AssetDatabase.LoadAssetAtPath<ScriptableObject>("Assets/Editor/NodeEditor/sss.asset");
-            if (data != null)
+            Self.m_assetObject = AssetDatabase.LoadAssetAtPath<ScriptableObject>("Assets/Editor/NodeEditor/sss.asset");
+            if (Self.m_assetObject != null)
             {
-                Self.nodeWnd.Add(new TableTypeNode(1,Self, data));
+                var data = Self.m_assetObject.GetType().GetField("data").GetValue(Self.m_assetObject);
+                Self.nodeWnd.Add(new TableTypeNode(1, Self, data));
             }
         }
 
@@ -92,10 +93,12 @@ namespace cfeditor
         }
         private void OnClickAddNode(Vector2 mousePosition)
         {
-            var wnd = new TableTypeNode(1, this, CreateInstance<StudentConfObject>());
+            m_assetObject = CreateInstance<StudentConfObject>();
+            var data = m_assetObject.GetType().GetField("data").GetValue(m_assetObject);
+            var wnd = new TableTypeNode(1, this, data);
             wnd.center = mousePosition;
             nodeWnd.Add(wnd);
-            AssetDatabase.CreateAsset(wnd.target, "Assets/Editor/NodeEditor/sss.asset");
+            AssetDatabase.CreateAsset(m_assetObject, "Assets/Editor/NodeEditor/sss.asset");
         }
 
         private void OnClickAddListNode(Vector2 mousePosition)
@@ -116,6 +119,8 @@ namespace cfeditor
 
         public List<Node> nodeWnd;
         private static NodeEditorWindow Self;
+
+        private ScriptableObject m_assetObject;
 
         List<CurveDraw> m_curveDraw = new List<CurveDraw>();
 
