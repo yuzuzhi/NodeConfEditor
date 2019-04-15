@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace cfeditor
 {
-
+    
     public class StudentConfObject : ConfObject<cfeditor.Student>
     {
     }
