@@ -5,7 +5,7 @@ using UnityEngine;
 namespace cfeditor
 {
     
-    public class StudentConfObject : ConfObject<cfeditor.Student>
+    public class StudentConfObject : TableObject<Student>
     {
     }
 

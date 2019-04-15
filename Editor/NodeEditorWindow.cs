@@ -15,8 +15,7 @@ namespace cfeditor
             var data = AssetDatabase.LoadAssetAtPath<ScriptableObject>("Assets/Editor/NodeEditor/sss.asset");
             if (data != null)
             {
-                Self.nodeWnd = new NodeWindow(Self);
-                Self.nodeWnd.target = data;
+                Self.nodeWnd = new TableNodeWindow(Self, data);
             }
         }
 
@@ -68,12 +67,11 @@ namespace cfeditor
         private void OnClickAddNode(Vector2 mousePosition)
         {
             if (nodeWnd == null)
-                nodeWnd = new NodeWindow(this);
-            Self.nodeWnd.target = CreateInstance<cfeditor.StudentConfObject>();
+                nodeWnd = new TableNodeWindow(this, CreateInstance<StudentConfObject>());
             AssetDatabase.CreateAsset(Self.nodeWnd.target, "Assets/Editor/NodeEditor/sss.asset");
         }
 
-        private NodeWindow nodeWnd;
+        private TableNodeWindow nodeWnd;
         private static NodeEditorWindow Self;
     }
 }

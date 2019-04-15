@@ -8,38 +8,40 @@ namespace cfeditor
 {
 
 
-    public class NodeWindow
+    public class TableNodeWindow
     {
 
-        public ScriptableObject target;
+        public ScriptableObject target
+        {
+            get { return m_target; }
+        }
 
-        public EditorWindow m_parent;
-
-        public NodeWindow(EditorWindow parent)
+        public TableNodeWindow(EditorWindow parent, ScriptableObject target)
         {
             m_parent = parent;
+            m_target = target;
         }
 
         public void OnGUI()
         {
-            pos = HorizResizer(pos); //right
-            pos = HorizResizer(pos, false); //left
+            m_position = HorizResizer(m_position); //right
+            m_position = HorizResizer(m_position, false); //left
 
-            pos = GUI.Window(1, pos, OnDrawGUI, target.name);
+            m_position = GUI.Window(1, m_position, OnDrawGUI, m_target.name);
         }
 
         void OnDrawGUI(int id)
         {
             GUI.DragWindow(new Rect(0, 0, 10000, 20));
 
-            var datafield = target.GetType().GetField("data");
+            var datafield = m_target.GetType().GetField("data");
             if (datafield == null)
                 return;
 
 
 
             var dataType = datafield.FieldType;
-            var dataValue = datafield.GetValue(target);
+            var dataValue = datafield.GetValue(m_target);
 
             var fieldsList = dataType.GetFields();
 
@@ -48,8 +50,12 @@ namespace cfeditor
                 var fieldInfo = fieldsList[i];
 
                 bool hasChanged = false;
-                var newValue = DrawBaseObject(fieldInfo.Name, fieldInfo.GetValue(dataValue), fieldInfo.FieldType,
-                    ref hasChanged);
+                object newValue = null;
+                if (DrawBaseObject(fieldInfo.Name, fieldInfo.GetValue(dataValue), fieldInfo.FieldType, ref newValue,
+                    ref hasChanged)) ;
+                else if(fieldInfo.FieldType.IsList())
+
+
                 if (hasChanged)
                 {
                     fieldInfo.SetValue(dataValue, newValue);
@@ -59,7 +65,7 @@ namespace cfeditor
 
             if (m_hasChanged)
             {
-                EditorUtility.SetDirty(target);
+                EditorUtility.SetDirty(m_target);
             }
 
         }
@@ -86,8 +92,8 @@ namespace cfeditor
             // if mouse is no longer dragging, stop tracking direction of drag
             if (current.type == EventType.MouseUp)
             {
-                draggingLeft = false;
-                draggingRight = false;
+                m_draggingLeft = false;
+                m_draggingRight = false;
             }
 
             // resize window if mouse is being dragged within resizor bounds
@@ -95,20 +101,20 @@ namespace cfeditor
                 current.mousePosition.x < resizer.xMax &&
                 current.type == EventType.MouseDrag &&
                 current.button == 0 ||
-                draggingLeft ||
-                draggingRight)
+                m_draggingLeft ||
+                m_draggingRight)
             {
-                if (right == !draggingLeft)
+                if (right == !m_draggingLeft)
                 {
                     window.width = current.mousePosition.x + current.delta.x;
                     m_parent.Repaint();
-                    draggingRight = true;
+                    m_draggingRight = true;
                 }
-                else if (!right == !draggingRight)
+                else if (!right == !m_draggingRight)
                 {
                     window.width = window.width - (current.mousePosition.x + current.delta.x);
                     m_parent.Repaint();
-                    draggingLeft = true;
+                    m_draggingLeft = true;
                 }
 
             }
@@ -116,9 +122,9 @@ namespace cfeditor
             return window;
         }
 
-        object DrawBaseObject(string strLabelText, object oldValue, Type objType, ref bool hasChanged)
+        bool DrawBaseObject(string strLabelText, object oldValue, Type objType, ref object newValue, ref bool hasChanged)
         {
-            object newValue = 0;
+            newValue = null;
             if (typeof (float) == objType)
             {
                 newValue = (object) EditorGUILayout.FloatField(strLabelText, (float) oldValue);
@@ -152,17 +158,16 @@ namespace cfeditor
                 if (!newValue.Equals(oldValue)) hasChanged = true;
             }
 
-            return newValue;
+            return newValue != null;
         }
 
 
         private bool m_hasChanged = false;
         private string m_name;
-
-        Rect pos = new Rect(10, 30, 200, 200);
-
-
-        bool draggingLeft = false;
-        bool draggingRight = false;
+        ScriptableObject m_target;
+        EditorWindow m_parent;
+        Rect m_position = new Rect(10, 30, 200, 200);
+        bool m_draggingLeft = false;
+        bool m_draggingRight = false;
     }
 }
