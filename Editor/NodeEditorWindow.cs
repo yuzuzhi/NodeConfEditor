@@ -12,10 +12,11 @@ namespace cfeditor
         {
             Self = GetWindow<NodeEditorWindow>();
             Self.Show(true);
+            Self.nodeWnd = new List<Node>();
             var data = AssetDatabase.LoadAssetAtPath<ScriptableObject>("Assets/Editor/NodeEditor/sss.asset");
             if (data != null)
             {
-                Self.nodeWnd = new TableNodeWindow(Self, data);
+                Self.nodeWnd.Add(new TableTypeNode(1,Self, data));
             }
         }
 
@@ -23,7 +24,12 @@ namespace cfeditor
         {
             BeginWindows();
             if (nodeWnd != null)
-                nodeWnd.OnGUI();
+            {
+                foreach (var tableTypeNode in Self.nodeWnd)
+                {
+                    tableTypeNode.OnGUI();
+                }
+            }
 
             ProcessEvents(Event.current);
             EndWindows();
@@ -62,16 +68,26 @@ namespace cfeditor
         {
             GenericMenu genericMenu = new GenericMenu();
             genericMenu.AddItem(new GUIContent("Add node"), false, () => OnClickAddNode(mousePosition));
+            genericMenu.AddItem(new GUIContent("Add list node"), false, () => OnClickAddListNode(mousePosition));
             genericMenu.ShowAsContext();
         }
         private void OnClickAddNode(Vector2 mousePosition)
         {
-            if (nodeWnd == null)
-                nodeWnd = new TableNodeWindow(this, CreateInstance<StudentConfObject>());
-            AssetDatabase.CreateAsset(Self.nodeWnd.target, "Assets/Editor/NodeEditor/sss.asset");
+            var wnd = new TableTypeNode(1, this, CreateInstance<StudentConfObject>());
+            wnd.center = mousePosition;
+            nodeWnd.Add(wnd);
+            AssetDatabase.CreateAsset(wnd.target, "Assets/Editor/NodeEditor/sss.asset");
         }
 
-        private TableNodeWindow nodeWnd;
+        private void OnClickAddListNode(Vector2 mousePosition)
+        {
+            var wnd = new BaseListTypeNode(2, this, new List<int>() {1,2});
+            wnd.center = mousePosition;
+            nodeWnd.Add(wnd);
+        }
+        
+
+        private List<Node> nodeWnd;
         private static NodeEditorWindow Self;
     }
 }
