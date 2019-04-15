@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace nodeeditor
+namespace cfeditor
 {
 
-    public class StudentConfObject : ConfObject<nodeeditor.Student>
+    public class StudentConfObject : ConfObject<cfeditor.Student>
     {
     }
 
