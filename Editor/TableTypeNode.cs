@@ -8,7 +8,7 @@ namespace cfeditor
 {
 
 
-    public class TableNodeWindow
+    public class TableTypeNode
     {
 
         public ScriptableObject target
@@ -16,7 +16,7 @@ namespace cfeditor
             get { return m_target; }
         }
 
-        public TableNodeWindow(EditorWindow parent, ScriptableObject target)
+        public TableTypeNode(EditorWindow parent, ScriptableObject target)
         {
             m_parent = parent;
             m_target = target;
