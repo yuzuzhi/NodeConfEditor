@@ -42,11 +42,6 @@ namespace cfeditor
         public List<int> listInt;
 
         public ObjReference info;
-
-        void ff()
-        {
-            Type t;
-        }
     }
 
 
