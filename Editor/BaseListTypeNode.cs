@@ -10,7 +10,7 @@ namespace cfeditor
 
     public class BaseListTypeNode : Node
     {
-        public BaseListTypeNode(int id, EditorWindow parent, IList target): base(id, parent)
+        public BaseListTypeNode(int id, NodeEditorWindow parent, IList target): base(id, parent)
         {
             m_target = target;
         }
@@ -18,6 +18,8 @@ namespace cfeditor
         public override void OnDrawGUI()
         {
             var listObj = m_target;
+            if (listObj == null)
+                return;
 
             var itemType = listObj.GetType().GetGenericArguments()[0];
             int insertIndex = -1, removeIndex = -1;

@@ -9,7 +9,7 @@ namespace cfeditor
 {
     public class Node
     {
-        public Node(int id, EditorWindow parent)
+        public Node(int id, NodeEditorWindow parent)
         {
             m_id = id;
             m_parent = parent;
@@ -19,6 +19,14 @@ namespace cfeditor
         {
             set { m_position.center = value; }
         }
+
+        public bool visiable
+        {
+            set { m_visiable = value; }
+            get { return m_visiable; }
+        }
+
+        public Rect position { get { return m_position; } }
 
         public void OnGUI()
         {
@@ -98,6 +106,14 @@ namespace cfeditor
 
             return window;
         }
+        
+        protected void DrawNodeCurve(Rect start, Rect end)
+        {
+            Vector3 startPos = new Vector3(start.x + start.width, start.y + start.height / 2, 0);
+            Vector3 endPos = new Vector3(end.x, end.y + 10, 0);
+            m_parent.DrawCurve(startPos, endPos);
+        }
+
 
         protected static bool DrawBaseObject(string strLabelText, object oldValue, Type objType, ref object newValue, ref bool hasChanged)
         {
@@ -144,13 +160,18 @@ namespace cfeditor
             return false;
         }
 
+        protected NodeEditorWindow parent { get { return m_parent; } }
+
+        protected int increasingIdent = 10001;
+
         private int m_id;
-        EditorWindow m_parent;
+        NodeEditorWindow m_parent;
         Rect m_position = new Rect(10, 30, 200, 200);
         bool m_draggingLeft = false;
         bool m_draggingRight = false;
         private string m_name;
         bool m_hasChanged = false;
+        bool m_visiable = true;
     }
 
 }

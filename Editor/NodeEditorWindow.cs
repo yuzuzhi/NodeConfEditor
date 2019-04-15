@@ -5,6 +5,11 @@ using UnityEngine;
 
 namespace cfeditor
 {
+    struct CurveDraw
+    {
+        public Vector3 start;
+        public Vector3 end;
+    }
     public class NodeEditorWindow : EditorWindow
     {
         [MenuItem("Window/ssss")]
@@ -25,18 +30,32 @@ namespace cfeditor
             BeginWindows();
             if (nodeWnd != null)
             {
-                foreach (var tableTypeNode in Self.nodeWnd)
+                foreach (var tableTypeNode in nodeWnd)
                 {
-                    tableTypeNode.OnGUI();
+                    if (tableTypeNode.visiable)
+                        tableTypeNode.OnGUI();
                 }
             }
+
+            foreach (var curveDraw in m_curveDraw)
+                DrawNodeCurve(curveDraw.start, curveDraw.end);
+            m_curveDraw.Clear();
+
 
             ProcessEvents(Event.current);
             EndWindows();
         }
 
 
-
+        void DrawNodeCurve(Vector3 startPos, Vector3 endPos)
+        {
+            Vector3 startTan = startPos + Vector3.right * 50;
+            Vector3 endTan = endPos + Vector3.left * 50;
+            Color shadowCol = new Color(0, 0, 0, 0.06f);
+            for (int i = 0; i < 3; i++) // Draw a shadow
+                Handles.DrawBezier(startPos, endPos, startTan, endTan, shadowCol, null, (i + 1) * 5);
+            //Handles.DrawBezier(startPos, endPos, startTan, endTan, Color.black, null, 1);
+        }
 
 
         private void ProcessEvents(Event e)
@@ -85,9 +104,20 @@ namespace cfeditor
             wnd.center = mousePosition;
             nodeWnd.Add(wnd);
         }
+
+        public void DrawCurve(Vector3 start, Vector3 end)
+        {
+            CurveDraw draw = new CurveDraw();
+            draw.start = start;
+            draw.end = end;
+            m_curveDraw.Add(draw);
+        }
         
 
-        private List<Node> nodeWnd;
+        public List<Node> nodeWnd;
         private static NodeEditorWindow Self;
+
+        List<CurveDraw> m_curveDraw = new List<CurveDraw>();
+
     }
 }
