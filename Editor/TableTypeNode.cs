@@ -19,7 +19,6 @@ namespace cfeditor
         {
             m_target = target;
         }
-        internal const float kSingleLineHeight = 16;
 
 
         public override void OnDrawGUI()
@@ -128,7 +127,9 @@ namespace cfeditor
                     Rect curvStart = position;
                     curvStart.yMin += (i + 1)*kSingleLineHeight;
                     curvStart.height = kSingleLineHeight;
-                    DrawNodeCurve(curvStart, fieldLink.linkNode.position);
+                    curvStart.xMin = position.xMin + position.width;
+                    curvStart.width = kSingleLineHeight;
+                    DrawNodeCurve(this, fieldLink.linkNode, curvStart, null);
                 }
 
 
@@ -137,17 +138,6 @@ namespace cfeditor
         
         protected object m_target;
 
-        protected class LinkedInfo
-        {
-            public LinkedInfo()
-            {
-                linkNode = null;
-                visiable = false;
-
-            }
-            public Node linkNode;
-            public bool visiable;
-        }
 
         protected Dictionary<FieldInfo, LinkedInfo> m_childrenByField = new Dictionary<FieldInfo, LinkedInfo>();
     }

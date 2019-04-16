@@ -57,6 +57,19 @@ namespace cfeditor
 
     public class Node
     {
+        protected class LinkedInfo
+        {
+            public LinkedInfo()
+            {
+                linkNode = null;
+                visiable = false;
+
+            }
+            public Node linkNode;
+            public bool visiable;
+        }
+        public const float kSingleLineHeight = 16;
+
         public Node(int id, NodeContiner parent)
         {
             m_id = id;
@@ -192,11 +205,10 @@ namespace cfeditor
             return window;
         }
         
-        protected void DrawNodeCurve(Rect start, Rect end)
+        protected void DrawNodeCurve(Node s, Node e, Rect start, NodeContiner.OnLinkBtn call)
         {
             Vector3 startPos = new Vector3(start.x + start.width, start.y + start.height / 2, 0);
-            Vector3 endPos = new Vector3(end.x, end.y + 10, 0);
-            m_parent.DrawCurve(startPos, endPos);
+            m_parent.DrawCurve(s, e, startPos, call);
         }
 
 

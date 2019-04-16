@@ -7,14 +7,21 @@ using UnityEngine;
 
 namespace cfeditor
 {
-    struct CurveDraw
+    public struct CurveDraw
     {
+
         public Vector3 start;
         public Vector3 end;
+
+        public Node startNode;
+        public Node endNode;
+
+        public NodeContiner.OnLinkBtn call;
     }
 
     public class NodeContiner
     {
+        public delegate void OnLinkBtn(ref CurveDraw draw);
         public int Count { get { return m_nodeList.Count; } }
 
         public Node GetByIndex(int i)
@@ -38,19 +45,40 @@ namespace cfeditor
                 window.Repaint();
         }
         
-        public void DrawCurve(Vector3 start, Vector3 end)
+        public void DrawCurve(Node s, Node e,Vector3 start, OnLinkBtn call)
         {
             CurveDraw draw = new CurveDraw();
             draw.start = start;
-            draw.end = end;
+            draw.startNode = s;
+            draw.endNode = e;
+            draw.call = call;
             m_curveDraw.Add(draw);
         }
 
         public void Draw()
         {
-
-            foreach (var curveDraw in m_curveDraw)
-                DrawNodeCurve(curveDraw.start, curveDraw.end);
+            //foreach (var curveDraw in m_curveDraw)
+            for(int i=0; i< m_curveDraw.Count;++i)
+            {
+                var curveDraw = m_curveDraw[i];
+                Rect rc = new Rect();
+                rc.xMin = curveDraw.start.x;
+                rc.yMin = curveDraw.start.y - Node.kSingleLineHeight * 0.5f;
+                rc.width = Node.kSingleLineHeight;
+                rc.height = Node.kSingleLineHeight;
+                bool btnShow = GUI.Button(rc, curveDraw.endNode != null && curveDraw.endNode.visiable ? "-" : "+");
+                if (btnShow)
+                {
+                    curveDraw.call(ref curveDraw);
+                    curveDraw.endNode.visiable = !curveDraw.endNode.visiable;
+                }
+                if (curveDraw.endNode != null && curveDraw.endNode.visiable)
+                {
+                    var end = curveDraw.endNode.position;
+                    Vector3 endPos = new Vector3(end.x, end.y + 10, 0);
+                    DrawNodeCurve(curveDraw.start, endPos);
+                }
+            }
             m_curveDraw.Clear();
         }
 
