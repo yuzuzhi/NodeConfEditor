@@ -10,10 +10,15 @@ namespace cfeditor
 
     public static class Utils
     {
-
+        public static bool IsList(this Type type)
+        {
+            return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>);
+        }
+        
         public static bool IsTable(this Type t)
         {
-            return t.IsClass;
+            return t.IsClass && !t.Is<string>();
+
         }
         public static bool IsTable(this FieldInfo t)
         {
