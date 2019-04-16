@@ -22,7 +22,7 @@ namespace cfeditor
             {
                 base.m_target = m_sriptableObj.GetType().GetField("data").GetValue(m_sriptableObj);
                 foreach (var VARIABLE in m_childrenByField)
-                    parent.remove(VARIABLE.Value);
+                    parent.remove(VARIABLE.Value.linkNode);
                 m_childrenByField.Clear();
             }
         }

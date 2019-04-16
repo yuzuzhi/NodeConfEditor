@@ -31,7 +31,7 @@ namespace cfeditor
 
             foreach (var node in m_childrenByField)
             {
-                if (node.Value.hasChanged)
+                if (node.Value.linkNode != null && node.Value.linkNode.hasChanged)
                 {
                     SetChanged();
                     break;
@@ -66,34 +66,38 @@ namespace cfeditor
                 int edgeWid = 0;
                 r.xMin = r.xMax - btnWid - edgeWid;
                 r.width = btnWid;
-                Node node = null;
-                m_childrenByField.TryGetValue(fieldInfo, out node);
-                bool btnShow = GUI.Button(r, node != null && node.visiable ? "-" : "+", EditorStyles.miniButton);
-
+                LinkedInfo fieldLink = null;
+                if (!m_childrenByField.TryGetValue(fieldInfo, out fieldLink))
+                {
+                    fieldLink = new LinkedInfo();
+                    m_childrenByField.Add(fieldInfo, fieldLink);
+                }
+                bool btnShow = GUI.Button(r, fieldLink != null && fieldLink.visiable ? "-" : "+", EditorStyles.miniButton);
+                if (btnShow)
+                    fieldLink.visiable = !fieldLink.visiable;
                 if (fieldInfo.FieldType.IsList())
                 {
-                    if (node == null)
+                    if (btnShow && fieldLink.visiable && fieldLink.linkNode == null)
                     {
                         bool isClassObjItem = fieldInfo.FieldType.GetGenericArguments()[0].IsTable();
                         if (isClassObjItem)
-                            node = new TableListTypeNode(increasingIdent++, parent, fieldValue as IList);
+                            fieldLink.linkNode = new TableListTypeNode(increasingIdent++, parent, fieldValue as IList);
                         else
-                            node = new BaseListTypeNode(increasingIdent++, parent, fieldValue as IList);
-                        m_childrenByField.Add(fieldInfo, node);
-                        parent.add(node);
+                            fieldLink.linkNode = new BaseListTypeNode(increasingIdent++, parent, fieldValue as IList);
+                        parent.add(fieldLink.linkNode);
                     }
                 }
                 else if (fieldInfo.IsObjReference())
                 {
-                    if (node == null)
+                    var objref = (ObjReference)fieldValue;
+
+                    if (btnShow && fieldLink.visiable && fieldLink.linkNode == null)
                     {
-                        node = new ObjReferenceTypeNode(increasingIdent++, parent, null);
-                        node.visiable = false;
-                        m_childrenByField.Add(fieldInfo, node);
-                        parent.add(node);
+                        fieldLink.linkNode = new ObjReferenceTypeNode(increasingIdent++, parent,
+                            (ScriptableObject) objref.target);
+                        parent.add(fieldLink.linkNode);
                     }
 
-                    var objref = (ObjReference) fieldValue;
                     r.xMin = EditorGUIUtility.labelWidth;
                     r.width = rect.width - r.xMin - btnWid;
                     var newObj = EditorGUI.ObjectField(r, objref.target, typeof (ScriptableObject),
@@ -102,20 +106,20 @@ namespace cfeditor
                     {
                         objref.target = newObj;
                         fieldInfo.SetValue(m_target, objref);
-                        ((ObjReferenceTypeNode) node).Reset((ScriptableObject) objref.target);
+                        ((ObjReferenceTypeNode)fieldLink.linkNode).Reset((ScriptableObject) objref.target);
                         SetChanged();
                     }
                 }
 
-
-                if (btnShow && node != null)
-                    node.visiable = !node.visiable;
-                if (node != null && node.visiable)
+                if (fieldLink.linkNode != null)
+                    fieldLink.linkNode.visiable = fieldLink.visiable;
+                
+                if (fieldLink.linkNode != null && fieldLink.visiable)
                 {
                     Rect curvStart = position;
                     curvStart.yMin += (i + 1)*kSingleLineHeight;
                     curvStart.height = kSingleLineHeight;
-                    DrawNodeCurve(curvStart, node.position);
+                    DrawNodeCurve(curvStart, fieldLink.linkNode.position);
                 }
 
 
@@ -124,6 +128,18 @@ namespace cfeditor
         
         protected object m_target;
 
-        protected Dictionary<FieldInfo, Node> m_childrenByField = new Dictionary<FieldInfo, Node>();
+        protected class LinkedInfo
+        {
+            public LinkedInfo()
+            {
+                linkNode = null;
+                visiable = false;
+
+            }
+            public Node linkNode;
+            public bool visiable;
+        }
+
+        protected Dictionary<FieldInfo, LinkedInfo> m_childrenByField = new Dictionary<FieldInfo, LinkedInfo>();
     }
 }
