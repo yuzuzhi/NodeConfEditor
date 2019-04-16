@@ -106,8 +106,17 @@ namespace cfeditor
                     {
                         objref.target = newObj;
                         fieldInfo.SetValue(m_target, objref);
-                        ((ObjReferenceTypeNode)fieldLink.linkNode).Reset((ScriptableObject) objref.target);
+                        if (fieldLink.linkNode != null)
+                            ((ObjReferenceTypeNode) fieldLink.linkNode).Reset((ScriptableObject) objref.target);
                         SetChanged();
+                    }
+                }
+                else if (fieldInfo.IsTable())
+                {
+                    if (btnShow && fieldLink.visiable && fieldLink.linkNode == null)
+                    {
+                        fieldLink.linkNode = new TableTypeNode(increasingIdent++, parent, fieldValue);
+                        parent.add(fieldLink.linkNode);
                     }
                 }
 

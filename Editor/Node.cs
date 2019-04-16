@@ -43,9 +43,18 @@ namespace cfeditor
         {
             return t.FieldType == typeof (ObjReference);
         }
-
-
     }
+
+    public static class Styles
+    {
+        public static GUIStyle styleWindowResize = GUI.skin.GetStyle( "WindowResizer" );
+    }
+
+    public static class GUIContents
+    {
+        public static GUIContent gcDrag = new GUIContent("", "drag to resize");
+    }
+
     public class Node
     {
         public Node(int id, NodeContiner parent)
@@ -70,7 +79,7 @@ namespace cfeditor
         public void OnGUI()
         {
             m_position = HorizResizer(m_position); //right
-            m_position = HorizResizer(m_position, false); //left
+            //m_position = HorizResizer(m_position, false); //left
             m_position = GUI.Window(m_id, m_position, OnDrawWindow, m_hasChanged ? m_name + "*" : m_name);
         }
 
@@ -93,7 +102,40 @@ namespace cfeditor
 
         public bool hasChanged { get { return m_hasChanged; } }
 
+        public static Rect ResizeWindow(Rect windowRect, ref bool isResizing, ref Rect resizeStart,
+            Vector2 minWindowSize)
+        {
+            Vector2 mouse =
+                GUIUtility.ScreenToGUIPoint(new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y));
+            Rect r = GUILayoutUtility.GetRect(GUIContents.gcDrag, Styles.styleWindowResize);
+            if (Event.current.type == EventType.MouseDown)
+            {
+                bool c = r.Contains(mouse);
+                isResizing = true;
+                resizeStart = new Rect(mouse.x, mouse.y, windowRect.width, windowRect.height);
+                //Event.current.Use();  // the GUI.Button below will eat the event, and this way it will show its active state
+            }
+            else if (Event.current.type == EventType.MouseUp && isResizing)
+            {
+                isResizing = false;
+            }
+            else if (!Input.GetMouseButton(0))
+            {
+                // if the mouse is over some other window we won't get an event, this just kind of circumvents that by checking the button state directly
+                isResizing = false;
+            }
+            else if (isResizing)
+            {
+                windowRect.width = Mathf.Max(minWindowSize.x, resizeStart.width + (mouse.x - resizeStart.x));
+                windowRect.height = Mathf.Max(minWindowSize.y, resizeStart.height + (mouse.y - resizeStart.y));
+                windowRect.xMax = Mathf.Min(Screen.width, windowRect.xMax); // modifying xMax affects width, not x
+                windowRect.yMax = Mathf.Min(Screen.height, windowRect.yMax); // modifying yMax affects height, not y
+            }
+            GUI.Button(r, mouse.ToString()/*GUIContents.gcDrag, Styles.styleWindowResize*/);
+            return windowRect;
+        }
 
+        private float ttt;
         private Rect HorizResizer(Rect window, bool right = true, float detectionRange = 8f)
         {
             detectionRange *= 0.5f;
@@ -113,6 +155,10 @@ namespace cfeditor
             Event current = Event.current;
             EditorGUIUtility.AddCursorRect(resizer, MouseCursor.ResizeHorizontal);
 
+            if (current.type == EventType.MouseDown)
+            {
+                ttt = current.mousePosition.x-m_position.xMax;
+            }
             // if mouse is no longer dragging, stop tracking direction of drag
             if (current.type == EventType.MouseUp)
             {
@@ -130,13 +176,13 @@ namespace cfeditor
             {
                 if (right == !m_draggingLeft)
                 {
-                    window.width = current.mousePosition.x + current.delta.x;
+                    window.width = current.mousePosition.x-ttt;// + current.delta.x;
                     m_parent.Repaint();
                     m_draggingRight = true;
                 }
                 else if (!right == !m_draggingRight)
                 {
-                    window.width = window.width - (current.mousePosition.x + current.delta.x);
+                    window.width = current.mousePosition.x - ttt;//window.width - (current.mousePosition.x + current.delta.x);
                     m_parent.Repaint();
                     m_draggingLeft = true;
                 }
@@ -243,6 +289,9 @@ namespace cfeditor
         private string m_name;
         bool m_hasChanged = false;
         bool m_visiable = true;
+
+        bool isResizing = false;
+        Rect resizeStart = new Rect();
     }
 
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using cfeditor;
+using UnityEditor;
 using UnityEngine;
 
 namespace cfeditor
@@ -31,6 +32,8 @@ namespace cfeditor
         public override void OnDrawGUI()
         {
             base.OnDrawGUI();
+            if (hasChanged)
+                EditorUtility.SetDirty(m_sriptableObj);
         }
 
 

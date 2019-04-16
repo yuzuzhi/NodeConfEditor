@@ -55,9 +55,9 @@ namespace cfeditor
 
         public Infomation info;
 
-        public List<int> listInt;
-        public List<string> liststr;
-        public List<Infomation> listobj;
+        public List<int> listInt = new List<int>();
+        public List<string> liststr = new List<string>();
+        public List<Infomation> listobj = new List<Infomation>();
 
         public ObjReference refField;
     }

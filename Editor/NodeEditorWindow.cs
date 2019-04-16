@@ -34,7 +34,8 @@ namespace cfeditor
 
         public void Repaint()
         {
-            
+            if (window != null)
+                window.Repaint();
         }
         
         public void DrawCurve(Vector3 start, Vector3 end)
@@ -66,6 +67,8 @@ namespace cfeditor
 
         List<CurveDraw> m_curveDraw = new List<CurveDraw>();
         protected List<Node> m_nodeList = new List<Node>();
+
+        public EditorWindow window;
     }
     public class NodeEditorWindow : EditorWindow
     {
@@ -84,6 +87,7 @@ namespace cfeditor
 
         void OnGUI()
         {
+            m_continer.window = this;
             BeginWindows();
             if (m_continer != null)
             {
@@ -131,27 +135,27 @@ namespace cfeditor
 
 
 
-            //如果鼠标正在拖拽中或拖拽结束时，并且鼠标所在位置在文本输入框内  
-            if (e.type == EventType.DragUpdated)
-            {
-                if (DragAndDrop.objectReferences != null && DragAndDrop.objectReferences.Length > 0)
-                {
-                    var obj = DragAndDrop.objectReferences[0] as ScriptableObject;
-                    var dataField = obj.GetType().GetField("data");
-                    if (dataField != null)
-                        DragAndDrop.visualMode = DragAndDropVisualMode.Generic;
-                }
-            }
-            if (e.type == EventType.DragExited)
-            {
-                if (DragAndDrop.objectReferences != null && DragAndDrop.objectReferences.Length > 0)
-                {
-                    var obj = DragAndDrop.objectReferences[0] as ScriptableObject;
-                    var dataField = obj.GetType().GetField("data");
-                    if (dataField != null)
-                        m_continer.add(new ObjReferenceTypeNode(1, m_continer, obj));
-                }
-            }
+            ////如果鼠标正在拖拽中或拖拽结束时，并且鼠标所在位置在文本输入框内  
+            //if (e.type == EventType.DragUpdated)
+            //{
+            //    if (DragAndDrop.objectReferences != null && DragAndDrop.objectReferences.Length > 0)
+            //    {
+            //        var obj = DragAndDrop.objectReferences[0] as ScriptableObject;
+            //        var dataField = obj.GetType().GetField("data");
+            //        if (dataField != null)
+            //            DragAndDrop.visualMode = DragAndDropVisualMode.Generic;
+            //    }
+            //}
+            //if (e.type == EventType.DragExited)
+            //{
+            //    if (DragAndDrop.objectReferences != null && DragAndDrop.objectReferences.Length > 0)
+            //    {
+            //        var obj = DragAndDrop.objectReferences[0] as ScriptableObject;
+            //        var dataField = obj.GetType().GetField("data");
+            //        if (dataField != null)
+            //            m_continer.add(new ObjReferenceTypeNode(1, m_continer, obj));
+            //    }
+            //}
         }
         private void ProcessContextMenu(Vector2 mousePosition)
         {
