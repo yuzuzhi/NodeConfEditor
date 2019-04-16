@@ -54,35 +54,46 @@ namespace cfeditor
                         fieldInfo.SetValue(m_target, newValue);
                         SetChanged();
                     }
+                    continue;
                 }
-                else if (fieldInfo.FieldType.IsList())
+
+                Rect r = EditorGUILayout.GetControlRect(true);
+                GUI.Label(r, fieldInfo.Name);
+                int btnWid = 30;
+                int edgeWid = 0;
+                r.xMin = r.xMax - btnWid - edgeWid;
+                r.width = btnWid;
+                Node node = null;
+                m_childrenByField.TryGetValue(fieldInfo, out node);
+                bool btnShow = GUI.Button(r, node != null && node.visiable ? "-" : "+", EditorStyles.miniButton);
+
+                if (fieldInfo.FieldType.IsList())
                 {
-                    //m_childrenByField
-                    Rect r = EditorGUILayout.GetControlRect(true);
-                    GUI.Label(r, fieldInfo.Name);
-                    int btnWid = 30;
-                    int edgeWid = 20;
-                    r.xMin = position.xMax - btnWid - edgeWid;
-                    r.width = btnWid;
-                    Node node;
-                    if (!m_childrenByField.TryGetValue(fieldInfo, out node))
+                    if (node==null)
                     {
-                        node = new BaseListTypeNode(increasingIdent++, parent, fieldValue as IList);
+                        bool isClassObjItem = fieldInfo.FieldType.GetGenericArguments()[0].IsTable();
+                        if (isClassObjItem)
+                            node = new TableListTypeNode(increasingIdent++, parent, fieldValue as IList);
+                        else
+                            node = new BaseListTypeNode(increasingIdent++, parent, fieldValue as IList);
                         m_childrenByField.Add(fieldInfo, node);
                         parent.nodeWnd.Add(node);
                     }
+                }
+                else if (fieldInfo.IsObjReference())
+                {
 
-                    bool btnShow = GUI.Button(r, node.visiable ? "-" : "+");
-                    if (btnShow)
-                        node.visiable = !node.visiable;
+                }
 
-                    if (node.visiable)
-                    {
-                        Rect curvStart = position;
-                        curvStart.yMin += (i + 1)*kSingleLineHeight;
-                        curvStart.height = kSingleLineHeight;
-                        DrawNodeCurve(curvStart, node.position);
-                    }
+
+                if (btnShow && node != null)
+                    node.visiable = !node.visiable;
+                if (node != null && node.visiable)
+                {
+                    Rect curvStart = position;
+                    curvStart.yMin += (i + 1)*kSingleLineHeight;
+                    curvStart.height = kSingleLineHeight;
+                    DrawNodeCurve(curvStart, node.position);
                 }
 
 

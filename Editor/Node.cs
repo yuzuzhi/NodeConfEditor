@@ -1,12 +1,32 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 using World.SNG;
 
 namespace cfeditor
 {
+
+    public static class Utils
+    {
+
+        public static bool IsTable(this Type t)
+        {
+            return t.IsClass;
+        }
+        public static bool IsTable(this FieldInfo t)
+        {
+            return t.FieldType.IsClass;
+        }
+        public static bool IsObjReference(this FieldInfo t)
+        {
+            return t.FieldType == typeof (ObjReference);
+        }
+
+
+    }
     public class Node
     {
         public Node(int id, NodeEditorWindow parent)
@@ -190,6 +210,7 @@ namespace cfeditor
 
             return false;
         }
+
 
         protected NodeEditorWindow parent { get { return m_parent; } }
 

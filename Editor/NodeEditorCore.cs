@@ -32,6 +32,13 @@ namespace cfeditor
     }
 
 
+    [Serializable]
+    public class Infomation
+    {
+        public string desc;
+        public float height;
+    }
+
 
     [Serializable]
     public class Student
@@ -39,10 +46,13 @@ namespace cfeditor
         public string name;
         public int age;
 
+        public Infomation info;
+
         public List<int> listInt;
         public List<string> liststr;
+        public List<Infomation> listobj;
 
-        public ObjReference info;
+        public ObjReference refField;
     }
 
 
