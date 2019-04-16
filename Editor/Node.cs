@@ -115,6 +115,37 @@ namespace cfeditor
         }
 
 
+
+        public delegate void OnDrawListItem(int i);
+        public delegate void OnDrawListItemEnd(int i, int insertIndex, int removeIndex);
+        protected static void DrawListObject(IList listObj, ref int insertIndex, ref int removeIndex, OnDrawListItem drawer)
+        {
+            if (listObj.Count == 0)
+            {
+                if (GUILayout.Button("+", GUILayout.Width(20)))
+                    insertIndex = 0;
+            }
+
+            var oldLabelWidth = EditorGUIUtility.labelWidth;
+            EditorGUIUtility.labelWidth = 40;
+
+            for (int i = 0; i < listObj.Count; i++)
+            {   
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    if (drawer != null)
+                        drawer(i);
+                    if (GUILayout.Button("+", EditorStyles.miniButtonLeft, GUILayout.Width(20)))
+                        insertIndex = i;
+                    if (GUILayout.Button("-", EditorStyles.miniButtonRight, GUILayout.Width(20)))
+                        removeIndex = i;
+                }
+            }
+
+            EditorGUIUtility.labelWidth = oldLabelWidth;
+
+        }
+
         protected static bool DrawBaseObject(string strLabelText, object oldValue, Type objType, ref object newValue, ref bool hasChanged)
         {
             newValue = null;

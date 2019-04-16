@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections;
-using UnityEditor;
 using UnityEngine;
+using UnityEditor;
+
 
 namespace cfeditor
 {
 
-
-    public class BaseListTypeNode : Node
+    public class TableListTypeNode : Node
     {
-        public BaseListTypeNode(int id, NodeEditorWindow parent, IList target): base(id, parent)
+        public TableListTypeNode(int id, NodeEditorWindow parent, IList target): base(id, parent)
         {
             m_target = target;
         }
@@ -22,8 +22,8 @@ namespace cfeditor
 
             var itemType = listObj.GetType().GetGenericArguments()[0];
             int insertIndex = -1, removeIndex = -1;
-            
-            DrawListObject(listObj, ref insertIndex, ref removeIndex, delegate(int i)
+
+            DrawListObject(listObj, ref insertIndex, ref removeIndex, delegate (int i)
             {
                 var listItemValue = listObj[i];
 
@@ -38,7 +38,9 @@ namespace cfeditor
                 }
 
             });
-            
+
+
+
             if (insertIndex != -1)
             {
                 var defType = itemType;

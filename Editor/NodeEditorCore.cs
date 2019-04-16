@@ -40,6 +40,7 @@ namespace cfeditor
         public int age;
 
         public List<int> listInt;
+        public List<string> liststr;
 
         public ObjReference info;
     }
