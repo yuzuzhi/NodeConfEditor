@@ -20,6 +20,21 @@ namespace cfeditor
             return t.IsClass && !t.Is<string>();
 
         }
+
+        public static bool Is<T>(this Type type)
+        {
+            var targetType = type;
+            var unityObjType = typeof(T);
+            while (targetType != null)
+            {
+                if (targetType == unityObjType)
+                    return true;
+                targetType = targetType.BaseType;
+            }
+
+            return false;
+        }
+
         public static bool IsTable(this FieldInfo t)
         {
             return t.FieldType.IsClass;
