@@ -1,5 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
@@ -10,41 +12,45 @@ namespace cfeditor
         public Vector3 start;
         public Vector3 end;
     }
-    public class NodeEditorWindow : EditorWindow
+
+    public class NodeContiner
     {
-        [MenuItem("Window/ssss")]
-        static void ddd()
+        public int Count { get { return m_nodeList.Count; } }
+
+        public Node GetByIndex(int i)
         {
-            Self = GetWindow<NodeEditorWindow>();
-            Self.Show(true);
-            Self.nodeWnd = new List<Node>();
-            Self.m_assetObject = AssetDatabase.LoadAssetAtPath<ScriptableObject>("Assets/Editor/NodeEditor/sss.asset");
-            if (Self.m_assetObject != null)
-            {
-                var data = Self.m_assetObject.GetType().GetField("data").GetValue(Self.m_assetObject);
-                Self.nodeWnd.Add(new TableTypeNode(1, Self, data));
-            }
+            return m_nodeList[i];
         }
 
-        void OnGUI()
+        public void add(Node n)
         {
-            BeginWindows();
-            if (nodeWnd != null)
-            {
-                foreach (var tableTypeNode in nodeWnd)
-                {
-                    if (tableTypeNode.visiable)
-                        tableTypeNode.OnGUI();
-                }
-            }
+            m_nodeList.Add(n);
+        }
+
+        public void remove(Node n)
+        {
+            m_nodeList.Remove(n);
+        }
+
+        public void Repaint()
+        {
+            
+        }
+        
+        public void DrawCurve(Vector3 start, Vector3 end)
+        {
+            CurveDraw draw = new CurveDraw();
+            draw.start = start;
+            draw.end = end;
+            m_curveDraw.Add(draw);
+        }
+
+        public void Draw()
+        {
 
             foreach (var curveDraw in m_curveDraw)
                 DrawNodeCurve(curveDraw.start, curveDraw.end);
             m_curveDraw.Clear();
-
-
-            ProcessEvents(Event.current);
-            EndWindows();
         }
 
 
@@ -57,6 +63,45 @@ namespace cfeditor
                 Handles.DrawBezier(startPos, endPos, startTan, endTan, shadowCol, null, (i + 1) * 5);
             //Handles.DrawBezier(startPos, endPos, startTan, endTan, Color.black, null, 1);
         }
+
+        List<CurveDraw> m_curveDraw = new List<CurveDraw>();
+        protected List<Node> m_nodeList = new List<Node>();
+    }
+    public class NodeEditorWindow : EditorWindow
+    {
+        [MenuItem("Window/ssss")]
+        static void ddd()
+        {
+            Self = GetWindow<NodeEditorWindow>();
+            Self.Show(true);
+            //Self.m_assetObject = AssetDatabase.LoadAssetAtPath<ScriptableObject>("Assets/Editor/NodeEditor/sss.asset");
+            //if (Self.m_assetObject != null)
+            //{
+            //    var data = Self.m_assetObject.GetType().GetField("data").GetValue(Self.m_assetObject);
+            //    Self.nodeWnd.Add(new TableTypeNode(1, Self, data));
+            //}
+        }
+
+        void OnGUI()
+        {
+            BeginWindows();
+            if (m_continer != null)
+            {
+                for (int i = 0; i < m_continer.Count; i++)
+                {
+                    var tableTypeNode = m_continer.GetByIndex(i);
+                    if (tableTypeNode.visiable)
+                        tableTypeNode.OnGUI();
+                }
+            }
+
+            m_continer.Draw();
+
+            ProcessEvents(Event.current);
+            EndWindows();
+        }
+
+
 
 
         private void ProcessEvents(Event e)
@@ -83,46 +128,77 @@ namespace cfeditor
                     }
                     break;
             }
+
+
+
+            //如果鼠标正在拖拽中或拖拽结束时，并且鼠标所在位置在文本输入框内  
+            if (e.type == EventType.DragUpdated)
+            {
+                if (DragAndDrop.objectReferences != null && DragAndDrop.objectReferences.Length > 0)
+                {
+                    var obj = DragAndDrop.objectReferences[0] as ScriptableObject;
+                    var dataField = obj.GetType().GetField("data");
+                    if (dataField != null)
+                        DragAndDrop.visualMode = DragAndDropVisualMode.Generic;
+                }
+            }
+            if (e.type == EventType.DragExited)
+            {
+                if (DragAndDrop.objectReferences != null && DragAndDrop.objectReferences.Length > 0)
+                {
+                    var obj = DragAndDrop.objectReferences[0] as ScriptableObject;
+                    var dataField = obj.GetType().GetField("data");
+                    if (dataField != null)
+                        m_continer.add(new ObjReferenceTypeNode(1, m_continer, obj));
+                }
+            }
         }
         private void ProcessContextMenu(Vector2 mousePosition)
         {
             GenericMenu genericMenu = new GenericMenu();
-            genericMenu.AddItem(new GUIContent("Add node"), false, () => OnClickAddNode(mousePosition));
-            genericMenu.AddItem(new GUIContent("Add list node"), false, () => OnClickAddListNode(mousePosition));
+            genericMenu.AddItem(new GUIContent("TestClassConfObject"), false, () => OnClickAddListNode(mousePosition, "TestClassConfObject"));
+            genericMenu.AddItem(new GUIContent("StudentConfObject"), false, () => OnClickAddListNode(mousePosition, "StudentConfObject"));
+            genericMenu.AddItem(new GUIContent("AutoDoorComponentConfObject"), false, () => OnClickAddListNode(mousePosition, "AutoDoorComponentConfObject"));
             genericMenu.ShowAsContext();
         }
-        private void OnClickAddNode(Vector2 mousePosition)
+
+        private void OnClickAddListNode(Vector2 mousePosition, string name)
         {
-            m_assetObject = CreateInstance<StudentConfObject>();
-            var data = m_assetObject.GetType().GetField("data").GetValue(m_assetObject);
-            var wnd = new TableTypeNode(1, this, data);
+            var typesByName = GetClasses("cfeditor.astdata");
+            Type t;
+            if (!typesByName.TryGetValue(name, out t))
+                return;
+
+            var assetObject = CreateInstance(t);
+            var assetType = assetObject.GetType();
+            var data = assetType.GetField("data").GetValue(assetObject);
+
+            var guid = GUID.Generate();
+            assetType.GetField("ident").SetValue(assetObject, guid.ToString());
+            var wnd = new TableTypeNode(1, m_continer, data);
             wnd.center = mousePosition;
-            nodeWnd.Add(wnd);
-            AssetDatabase.CreateAsset(m_assetObject, "Assets/Editor/NodeEditor/sss.asset");
+            m_continer.add(wnd);
+            AssetDatabase.CreateAsset(assetObject, string.Format("Assets/Editor/NodeEditor/{0}.asset", name));
         }
 
-        private void OnClickAddListNode(Vector2 mousePosition)
+        static Dictionary<string,Type> GetClasses(string nameSpace)
         {
-            var wnd = new BaseListTypeNode(2, this, new List<int>() {1,2});
-            wnd.center = mousePosition;
-            nodeWnd.Add(wnd);
+            Assembly asm = Assembly.GetExecutingAssembly();
+
+            Dictionary<string,Type> classlist = new Dictionary<string,Type>();
+            var allTypes = asm.GetTypes();
+            foreach (Type type in allTypes)
+            {
+                if (type.Namespace == nameSpace)
+                    classlist.Add(type.Name, type);
+            }
+            return classlist;
         }
 
-        public void DrawCurve(Vector3 start, Vector3 end)
-        {
-            CurveDraw draw = new CurveDraw();
-            draw.start = start;
-            draw.end = end;
-            m_curveDraw.Add(draw);
-        }
-        
 
-        public List<Node> nodeWnd;
+
+        private NodeContiner m_continer = new NodeContiner();
         private static NodeEditorWindow Self;
-
-        private ScriptableObject m_assetObject;
-
-        List<CurveDraw> m_curveDraw = new List<CurveDraw>();
 
     }
 }

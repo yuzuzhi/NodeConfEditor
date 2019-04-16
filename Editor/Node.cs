@@ -29,7 +29,7 @@ namespace cfeditor
     }
     public class Node
     {
-        public Node(int id, NodeEditorWindow parent)
+        public Node(int id, NodeContiner parent)
         {
             m_id = id;
             m_parent = parent;
@@ -212,12 +212,12 @@ namespace cfeditor
         }
 
 
-        protected NodeEditorWindow parent { get { return m_parent; } }
+        protected NodeContiner parent { get { return m_parent; } }
 
         protected int increasingIdent = 10001;
 
         private int m_id;
-        NodeEditorWindow m_parent;
+        NodeContiner m_parent;
         Rect m_position = new Rect(10, 30, 200, 200);
         bool m_draggingLeft = false;
         bool m_draggingRight = false;

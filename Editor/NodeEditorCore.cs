@@ -8,8 +8,14 @@ using UnityEngine;
 namespace cfeditor
 {
     
-    public class TableObject<T> : ScriptableObject
+    public class TableObject<T> : ScriptableObject where T : new()
     {
+        public TableObject()
+        {
+            data = new T();
+        }
+        public string ident;
+        public string name;
         public T data;
         public List<ScriptableObject> localOjbects;
     }
@@ -26,7 +32,8 @@ namespace cfeditor
     [Serializable]
     public struct ObjReference
     {
-        public int ident;
+        public string ident;
+        public UnityEngine.Object target;
         public string type;
         public bool local;
     }
@@ -53,6 +60,14 @@ namespace cfeditor
         public List<Infomation> listobj;
 
         public ObjReference refField;
+    }
+
+    [Serializable]
+    public class TestClass
+    {
+        public int aaa;
+        public float bbb;
+        public string ccc;
     }
 
 

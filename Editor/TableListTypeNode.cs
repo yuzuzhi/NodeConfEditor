@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
@@ -9,7 +10,7 @@ namespace cfeditor
 
     public class TableListTypeNode : Node
     {
-        public TableListTypeNode(int id, NodeEditorWindow parent, IList target): base(id, parent)
+        public TableListTypeNode(int id, NodeContiner parent, IList target): base(id, parent)
         {
             m_target = target;
         }
@@ -62,5 +63,6 @@ namespace cfeditor
 
 
         IList m_target;
+        List<Node> m_nodeOfItems = new List<Node>();
     }
 }

@@ -15,7 +15,7 @@ namespace cfeditor
             get { return m_target; }
         }
 
-        public TableTypeNode(int id, NodeEditorWindow parent, object target):base(id, parent)
+        public TableTypeNode(int id, NodeContiner parent, object target):base(id, parent)
         {
             m_target = target;
         }
@@ -25,7 +25,9 @@ namespace cfeditor
         public override void OnDrawGUI()
         {
             if (m_target == null)
+            {
                 return;
+            }
 
             foreach (var node in m_childrenByField)
             {
@@ -57,7 +59,8 @@ namespace cfeditor
                     continue;
                 }
 
-                Rect r = EditorGUILayout.GetControlRect(true);
+                Rect rect = EditorGUILayout.GetControlRect(true);
+                Rect r = rect;
                 GUI.Label(r, fieldInfo.Name);
                 int btnWid = 30;
                 int edgeWid = 0;
@@ -69,7 +72,7 @@ namespace cfeditor
 
                 if (fieldInfo.FieldType.IsList())
                 {
-                    if (node==null)
+                    if (node == null)
                     {
                         bool isClassObjItem = fieldInfo.FieldType.GetGenericArguments()[0].IsTable();
                         if (isClassObjItem)
@@ -77,12 +80,31 @@ namespace cfeditor
                         else
                             node = new BaseListTypeNode(increasingIdent++, parent, fieldValue as IList);
                         m_childrenByField.Add(fieldInfo, node);
-                        parent.nodeWnd.Add(node);
+                        parent.add(node);
                     }
                 }
                 else if (fieldInfo.IsObjReference())
                 {
+                    if (node == null)
+                    {
+                        node = new ObjReferenceTypeNode(increasingIdent++, parent, null);
+                        node.visiable = false;
+                        m_childrenByField.Add(fieldInfo, node);
+                        parent.add(node);
+                    }
 
+                    var objref = (ObjReference) fieldValue;
+                    r.xMin = EditorGUIUtility.labelWidth;
+                    r.width = rect.width - r.xMin - btnWid;
+                    var newObj = EditorGUI.ObjectField(r, objref.target, typeof (ScriptableObject),
+                        false);
+                    if (newObj != objref.target)
+                    {
+                        objref.target = newObj;
+                        fieldInfo.SetValue(m_target, objref);
+                        ((ObjReferenceTypeNode) node).Reset((ScriptableObject) objref.target);
+                        SetChanged();
+                    }
                 }
 
 
@@ -100,8 +122,8 @@ namespace cfeditor
             }
         }
         
-        object m_target;
+        protected object m_target;
 
-        Dictionary<FieldInfo, Node> m_childrenByField = new Dictionary<FieldInfo, Node>();
+        protected Dictionary<FieldInfo, Node> m_childrenByField = new Dictionary<FieldInfo, Node>();
     }
 }

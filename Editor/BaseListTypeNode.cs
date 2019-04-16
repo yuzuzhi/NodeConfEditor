@@ -9,7 +9,7 @@ namespace cfeditor
 
     public class BaseListTypeNode : Node
     {
-        public BaseListTypeNode(int id, NodeEditorWindow parent, IList target): base(id, parent)
+        public BaseListTypeNode(int id, NodeContiner parent, IList target): base(id, parent)
         {
             m_target = target;
         }
