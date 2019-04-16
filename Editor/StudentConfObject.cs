@@ -18,10 +18,6 @@ namespace cfeditor
             
         }
 
-        public class AutoDoorComponentConfObject : TableObject<AutoDoorComponent>
-        {
-        }
-
     }
 
 }

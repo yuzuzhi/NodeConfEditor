@@ -51,7 +51,7 @@ namespace cfeditor
                 if (DrawBaseObject(fieldInfo.Name, fieldValue, fieldInfo.FieldType, ref newValue,
                     ref bchanged))
                 {
-                    if (hasChanged)
+                    if (bchanged)
                     {
                         fieldInfo.SetValue(m_target, newValue);
                         SetChanged();
