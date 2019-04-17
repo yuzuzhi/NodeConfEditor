@@ -33,34 +33,22 @@ namespace cfeditor
                 var fieldLink = m_nodeOfItems[i];
                 if (fieldLink == null)
                     fieldLink = m_nodeOfItems[i] = new LinkedInfo();
-
-
-                bool bListItemChnged = false;
-                string label = string.Format("[{0}]", i);
-
-                Rect rect = EditorGUILayout.GetControlRect(true);
-                Rect r = rect;
-                GUI.Label(r, label);
-                int btnWid = 30;
-                int edgeWid = 0;
-                r.xMin = r.xMax - btnWid - edgeWid;
-                r.width = btnWid;
-
-
+                
+                EditorGUILayout.LabelField(string.Format("[{0}]", i));
 
                 Rect curvStart = CalcuControlRect(i, null);
                 DrawNodeCurve(this, fieldLink.linkNode, curvStart, delegate (ref CurveDraw draw)
                 {
                     if (fieldLink.linkNode == null)
                     {
-                        fieldLink.linkNode = new TableTypeNode(increasingIdent, parent, listItemValue);
+                        fieldLink.linkNode = new TableTypeNode(increasingIdent++, parent, listItemValue);
                         draw.endNode = fieldLink.linkNode;
                         parent.add(fieldLink.linkNode);
                     }
                 });
 
 
-                if (fieldLink.linkNode!=null&& fieldLink.linkNode.hasChanged)
+                if (fieldLink.linkNode != null && fieldLink.linkNode.hasChanged)
                 {
                     SetChanged();
                 }

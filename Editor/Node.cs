@@ -302,7 +302,7 @@ namespace cfeditor
 
         protected NodeContiner parent { get { return m_parent; } }
 
-        protected int increasingIdent = 10001;
+        protected static int increasingIdent = 10001;
 
         private int m_id;
         NodeContiner m_parent;
