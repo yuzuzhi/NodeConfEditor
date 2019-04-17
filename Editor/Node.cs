@@ -48,6 +48,11 @@ namespace cfeditor
     public static class Styles
     {
         public static GUIStyle styleWindowResize = GUI.skin.GetStyle( "WindowResizer" );
+
+        public static GUIStyle toolbarButton = GUI.skin.FindStyle("toolbarButton");
+        public static GUIStyle toolbarLabel = GUI.skin.FindStyle("toolbarButton");
+        public static GUIStyle toolbarDropdown = GUI.skin.FindStyle("toolbarDropdown");
+        public static GUIStyle toolbar = GUI.skin.FindStyle("toolbar");
     }
 
     public static class GUIContents

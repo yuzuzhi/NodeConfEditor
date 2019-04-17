@@ -119,7 +119,9 @@ namespace cfeditor
         {
             m_continer.window = this;
 
-            GUILayout.Label(m_continer.Count.ToString());
+            DrawToolbarGUI(new Rect(0, 0, Screen.width, 0));
+
+
             BeginWindows();
             if (m_continer != null&& m_continer.Count!=0)
             {
@@ -151,7 +153,22 @@ namespace cfeditor
             ProcessEvents(Event.current);
             EndWindows();
         }
+        public float toolbarHeight = 17;
 
+        public void DrawToolbarGUI(Rect rect)
+        {
+            rect.height = toolbarHeight;
+            GUILayout.BeginArea(rect, Styles.toolbar);
+            GUILayout.BeginHorizontal();
+            float curToolbarHeight = 0;
+
+            if (GUILayout.Button("File", Styles.toolbarDropdown, GUILayout.Width(50)))
+            {
+            }
+
+            GUILayout.EndArea();
+            GUILayout.EndHorizontal();
+        }
 
 
 
@@ -179,30 +196,7 @@ namespace cfeditor
                     }
                     break;
             }
-
-
-
-            ////如果鼠标正在拖拽中或拖拽结束时，并且鼠标所在位置在文本输入框内  
-            //if (e.type == EventType.DragUpdated)
-            //{
-            //    if (DragAndDrop.objectReferences != null && DragAndDrop.objectReferences.Length > 0)
-            //    {
-            //        var obj = DragAndDrop.objectReferences[0] as ScriptableObject;
-            //        var dataField = obj.GetType().GetField("data");
-            //        if (dataField != null)
-            //            DragAndDrop.visualMode = DragAndDropVisualMode.Generic;
-            //    }
-            //}
-            //if (e.type == EventType.DragExited)
-            //{
-            //    if (DragAndDrop.objectReferences != null && DragAndDrop.objectReferences.Length > 0)
-            //    {
-            //        var obj = DragAndDrop.objectReferences[0] as ScriptableObject;
-            //        var dataField = obj.GetType().GetField("data");
-            //        if (dataField != null)
-            //            m_continer.add(new ObjReferenceTypeNode(1, m_continer, obj));
-            //    }
-            //}
+           
         }
         private void ProcessContextMenu(Vector2 mousePosition)
         {
@@ -229,7 +223,8 @@ namespace cfeditor
             var wnd = new TableTypeNode(1, m_continer, data);
             wnd.center = mousePosition;
             m_continer.add(wnd);
-            AssetDatabase.CreateAsset(assetObject, string.Format("Assets/Editor/NodeEditor/{0}.asset", name));
+            var fullPath = string.Format("{0}{1}.asset", Settings.Instance.confpath, name);
+            AssetDatabase.CreateAsset(assetObject, fullPath);
         }
 
         static Dictionary<string,Type> GetClasses(string nameSpace)
