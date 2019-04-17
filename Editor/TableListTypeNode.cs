@@ -71,6 +71,10 @@ namespace cfeditor
             }
             if (removeIndex != -1)
             {
+                var item = m_nodeOfItems[removeIndex];
+                if (item.linkNode != null)
+                    parent.remove(item.linkNode);
+                m_nodeOfItems.RemoveAt(removeIndex);
                 listObj.RemoveAt(removeIndex);
                 SetChanged();
             }
