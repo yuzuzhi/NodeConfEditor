@@ -88,6 +88,7 @@ namespace cfeditor
                                     fieldValue as IList);
                             else
                                 fieldLink.linkNode = new BaseListTypeNode(increasingIdent++, parent, fieldValue as IList);
+                            fieldLink.linkNode.SetPosition = ReCalcuChildPos(fieldLink.linkNode.position, curvStart);
                             draw.endNode = fieldLink.linkNode;
                             parent.add(fieldLink.linkNode);
                         }
@@ -105,6 +106,7 @@ namespace cfeditor
                         {
                             fieldLink.linkNode = new ObjReferenceTypeNode(increasingIdent++, parent,
                                 (ScriptableObject) objref.target);
+                            fieldLink.linkNode.SetPosition = ReCalcuChildPos(fieldLink.linkNode.position, curvStart);
                             draw.endNode = fieldLink.linkNode;
                             parent.add(fieldLink.linkNode);
                         }
@@ -143,16 +145,6 @@ namespace cfeditor
             }
         }
 
-        Rect ReCalcuChildPos(Rect childPos, Rect pos)
-        {
-            var w = childPos.width;
-            var h = childPos.height;
-            childPos.x = this.position.xMax + 5;
-            childPos.y = pos.y;
-            childPos.width = w;
-            childPos.height = h;
-            return childPos;
-        }
         
         protected object m_target;
 

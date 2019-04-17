@@ -212,6 +212,16 @@ namespace cfeditor
             Vector3 startPos = new Vector3(start.x, start.y + start.height/2, 0);
             m_parent.DrawCurve(s, e, startPos, call);
         }
+        protected Rect ReCalcuChildPos(Rect childPos, Rect pos)
+        {
+            var w = childPos.width;
+            var h = childPos.height;
+            childPos.x = this.position.xMax + 50;
+            childPos.y = pos.y;
+            childPos.width = w;
+            childPos.height = h;
+            return childPos;
+        }
 
         protected Rect CalcuControlRect(int index, Type t)
         {

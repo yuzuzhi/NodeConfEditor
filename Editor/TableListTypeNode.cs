@@ -42,6 +42,7 @@ namespace cfeditor
                     if (fieldLink.linkNode == null)
                     {
                         fieldLink.linkNode = new TableTypeNode(increasingIdent++, parent, listItemValue);
+                            fieldLink.linkNode.SetPosition = ReCalcuChildPos(fieldLink.linkNode.position, curvStart);
                         draw.endNode = fieldLink.linkNode;
                         parent.add(fieldLink.linkNode);
                     }
