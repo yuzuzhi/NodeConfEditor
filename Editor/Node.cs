@@ -228,6 +228,35 @@ namespace cfeditor
             m_children.Remove(child);
         }
 
+        public Node children { get { return m_childrennode;} }
+        public Node nextnode { get { return m_nextnode;} }
+        public Node prefnode { get { return m_prefnode;} }
+
+        protected Node SetChildren { set { m_childrennode = value; } }
+
+        protected Node SetNextNode
+        {
+            set
+            {
+                var old = m_nextnode;
+                value.m_nextnode = old;
+                value.m_prefnode = this;
+
+                m_nextnode = value;
+            }
+        }
+        protected Node SetPrefNode
+        {
+            set
+            {
+                var old = m_prefnode;
+                m_prefnode = value;
+                m_prefnode.m_prefnode = old;
+            }
+        }
+
+
+
         public void OnGUI()
         {
             if (m_canResize)
@@ -368,6 +397,10 @@ namespace cfeditor
         Rect resizeStart = new Rect();
 
         List<Node> m_children = new List<Node>();
+        private Node m_childrennode;
+        private Node m_prefnode;
+        private Node m_nextnode;
+
         bool m_canResize;
     }
 
