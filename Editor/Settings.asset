@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e978c242a6751ac47882cd3fd717cf2e, type: 3}
   m_Name: Settings
   m_EditorClassIdentifier: 
-  confpath: 
+  confpath: Assets\cfeditor\trunk\Editor\Data\

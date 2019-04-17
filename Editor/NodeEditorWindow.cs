@@ -77,8 +77,9 @@ namespace cfeditor
                 if (curveDraw.endNode != null && curveDraw.endNode.visiable)
                 {
                     var end = curveDraw.endNode.position;
+                    Vector3 staPos = curveDraw.start + new Vector3(rc.width, 0, 0);
                     Vector3 endPos = new Vector3(end.x, end.y + 10, 0);
-                    DrawNodeCurve(curveDraw.start, endPos);
+                    DrawNodeCurve(staPos, endPos);
                 }
             }
             m_curveDraw.Clear();
@@ -169,8 +170,7 @@ namespace cfeditor
             GUILayout.EndArea();
             GUILayout.EndHorizontal();
         }
-
-
+        
 
         private void ProcessEvents(Event e)
         {
@@ -216,11 +216,10 @@ namespace cfeditor
 
             var assetObject = CreateInstance(t);
             var assetType = assetObject.GetType();
-            var data = assetType.GetField("data").GetValue(assetObject);
 
             var guid = GUID.Generate();
             assetType.GetField("ident").SetValue(assetObject, guid.ToString());
-            var wnd = new TableTypeNode(1, m_continer, data);
+            var wnd = new ObjReferenceTypeNode(1, m_continer, assetObject);
             wnd.center = mousePosition;
             m_continer.add(wnd);
             var fullPath = string.Format("{0}{1}.asset", Settings.Instance.confpath, name);

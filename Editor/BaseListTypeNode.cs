@@ -9,9 +9,10 @@ namespace cfeditor
 
     public class BaseListTypeNode : Node
     {
-        public BaseListTypeNode(int id, NodeContiner parent, IList target): base(id, parent)
+        public BaseListTypeNode(int id, NodeContiner parent, IList target) : base(id, parent, true)
         {
             m_target = target;
+            ResizeHeight();
         }
 
         public override void OnDrawGUI()
@@ -22,7 +23,7 @@ namespace cfeditor
 
             var itemType = listObj.GetType().GetGenericArguments()[0];
             int insertIndex = -1, removeIndex = -1;
-            
+
             NodeUtils.DrawListObject(listObj, ref insertIndex, ref removeIndex, delegate(int i)
             {
                 var listItemValue = listObj[i];
@@ -38,7 +39,7 @@ namespace cfeditor
                 }
 
             });
-            
+
             if (insertIndex != -1)
             {
                 var defType = itemType;
@@ -49,16 +50,29 @@ namespace cfeditor
                     addingObj = Activator.CreateInstance(defType);
                 listObj.Insert(insertIndex, addingObj);
                 SetChanged();
+                ResizeHeight();
             }
             if (removeIndex != -1)
             {
                 listObj.RemoveAt(removeIndex);
                 SetChanged();
+                ResizeHeight();
             }
+        }
+
+        void ResizeHeight()
+        {
+            if (m_target == null)
+                return;
+            var p = position;
+            int listCount = m_target != null ? m_target.Count : 0;
+            int count = Mathf.Max(listCount, 1);
+            p.height = (count+2)*(kSingleLineHeight + EditorGUIUtility.standardVerticalSpacing);
+            SetPosition = p;
         }
 
 
 
-        IList m_target;
+IList m_target;
     }
 }

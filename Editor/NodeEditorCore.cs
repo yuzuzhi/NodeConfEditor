@@ -33,9 +33,8 @@ namespace cfeditor
     public struct ObjReference
     {
         public string ident;
+        public string SelfType;
         public UnityEngine.Object target;
-        public string type;
-        public bool local;
     }
 
 

@@ -15,7 +15,7 @@ namespace cfeditor
             get { return m_target; }
         }
 
-        public TableTypeNode(int id, NodeContiner parent, object target):base(id, parent)
+        public TableTypeNode(int id, NodeContiner parent, object target):base(id, parent, true)
         {
             m_target = target;
         }

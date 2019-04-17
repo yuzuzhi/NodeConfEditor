@@ -74,7 +74,7 @@ namespace cfeditor
             }
 
             var oldLabelWidth = EditorGUIUtility.labelWidth;
-            EditorGUIUtility.labelWidth = 40;
+            EditorGUIUtility.labelWidth = 30;
 
             for (int i = 0; i < listObj.Count; i++)
             {
@@ -190,11 +190,12 @@ namespace cfeditor
         }
         public const float kSingleLineHeight = 16;
 
-        public Node(int id, NodeContiner parent)
+        public Node(int id, NodeContiner parent, bool canResize = false)
         {
             m_id = id;
             m_parent = parent;
             m_name = this.GetType().Name;
+            m_canResize = canResize;
         }
 
         public Vector2 center
@@ -229,7 +230,8 @@ namespace cfeditor
 
         public void OnGUI()
         {
-            m_position = HorizResizer(m_position); //right
+            if (m_canResize)
+                m_position = HorizResizer(m_position); //right
             //m_position = HorizResizer(m_position, false); //left
             m_position = GUI.Window(m_id, m_position, OnDrawWindow, m_hasChanged ? m_name + "*" : m_name);
         }
@@ -249,6 +251,16 @@ namespace cfeditor
         public void SetChanged()
         {
             m_hasChanged = true;
+        }
+
+        public void ClearChanged()
+        {
+            m_hasChanged = false;
+
+            foreach (var mChild in m_children)
+            {
+                mChild.ClearChanged();
+            }
         }
 
         public bool hasChanged { get { return m_hasChanged; } }
@@ -328,9 +340,11 @@ namespace cfeditor
 
         protected Rect CalcuControlRect(int index, Type t)
         {
+            var lastRect = GUILayoutUtility.GetLastRect();
+
             Rect curvStart = position;
             curvStart.x = position.x + position.width;
-            curvStart.y += (index + 1) * (kSingleLineHeight + EditorGUIUtility.standardVerticalSpacing);
+            curvStart.y += m_controlStartY + (index + 1)*(kSingleLineHeight + EditorGUIUtility.standardVerticalSpacing);
             curvStart.height = kSingleLineHeight;
             curvStart.width = kSingleLineHeight;
             return curvStart;
@@ -341,6 +355,7 @@ namespace cfeditor
         protected static int increasingIdent = 10001;
 
         private int m_id;
+        protected float m_controlStartY = 0;
         NodeContiner m_parent;
         Rect m_position = new Rect(10, 30, 200, 200);
         bool m_draggingLeft = false;
@@ -353,6 +368,7 @@ namespace cfeditor
         Rect resizeStart = new Rect();
 
         List<Node> m_children = new List<Node>();
+        bool m_canResize;
     }
 
 }

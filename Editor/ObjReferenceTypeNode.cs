@@ -31,6 +31,20 @@ namespace cfeditor
 
         public override void OnDrawGUI()
         {
+
+            var rect = EditorGUILayout.GetControlRect(true);
+            float btnwid = 30;
+            float edgwid = 5;
+            rect.x = position.width - btnwid - edgwid;
+            rect.width = btnwid;
+            m_controlStartY = kSingleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+            if (GUI.Button(rect, "S", EditorStyles.miniButtonRight))
+            {
+                AssetDatabase.SaveAssets();
+                this.ClearChanged();
+
+            }
+
             base.OnDrawGUI();
             if (hasChanged)
                 EditorUtility.SetDirty(m_sriptableObj);

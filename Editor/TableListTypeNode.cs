@@ -13,6 +13,10 @@ namespace cfeditor
         public TableListTypeNode(int id, NodeContiner parent, IList target): base(id, parent)
         {
             m_target = target;
+            var p = position;
+            p.width = 100;
+            SetPosition = p;
+            ResizeHeight();
         }
 
         public override void OnDrawGUI()
@@ -33,8 +37,8 @@ namespace cfeditor
                 var fieldLink = m_nodeOfItems[i];
                 if (fieldLink == null)
                     fieldLink = m_nodeOfItems[i] = new LinkedInfo();
-                
-                EditorGUILayout.LabelField(string.Format("[{0}]", i));
+
+                GUILayout.Label(string.Format("[{0}]", i), GUILayout.Width(EditorGUIUtility.labelWidth));
 
                 Rect curvStart = CalcuControlRect(i, null);
                 DrawNodeCurve(this, fieldLink.linkNode, curvStart, delegate (ref CurveDraw draw)
@@ -69,6 +73,7 @@ namespace cfeditor
                     addingObj = Activator.CreateInstance(defType);
                 listObj.Insert(insertIndex, addingObj);
                 SetChanged();
+                ResizeHeight();
             }
             if (removeIndex != -1)
             {
@@ -78,9 +83,20 @@ namespace cfeditor
                 m_nodeOfItems.RemoveAt(removeIndex);
                 listObj.RemoveAt(removeIndex);
                 SetChanged();
+                ResizeHeight();
             }
         }
 
+        void ResizeHeight()
+        {
+            if (m_target == null)
+                return;
+            var p = position;
+            int listCount = m_target != null ? m_target.Count : 0;
+            int count = Mathf.Max(listCount, 1);
+            p.height = (count + 2) * (kSingleLineHeight + EditorGUIUtility.standardVerticalSpacing);
+            SetPosition = p;
+        }
 
 
         IList m_target;
