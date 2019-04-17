@@ -88,6 +88,7 @@ namespace cfeditor
         }
 
         public Rect position { get { return m_position; } }
+        public Rect SetPosition { set { m_position = value; } }
 
         public void OnGUI()
         {

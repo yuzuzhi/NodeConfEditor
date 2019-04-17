@@ -115,6 +115,7 @@ namespace cfeditor
                     if (btnShow && fieldLink.visiable && fieldLink.linkNode == null)
                     {
                         fieldLink.linkNode = new TableTypeNode(increasingIdent++, parent, fieldValue);
+                        fieldLink.linkNode.SetPosition = ReCalcuChildPos(fieldLink.linkNode.position, r);
                         parent.add(fieldLink.linkNode);
                     }
                 }
@@ -125,15 +126,26 @@ namespace cfeditor
                 if (fieldLink.linkNode != null && fieldLink.visiable)
                 {
                     Rect curvStart = position;
-                    curvStart.yMin += (i + 1)*kSingleLineHeight;
+                    curvStart.x = position.xMin + position.width;
+                    curvStart.y += (i + 1)*kSingleLineHeight;
                     curvStart.height = kSingleLineHeight;
-                    curvStart.xMin = position.xMin + position.width;
                     curvStart.width = kSingleLineHeight;
                     DrawNodeCurve(this, fieldLink.linkNode, curvStart, null);
                 }
 
 
             }
+        }
+
+        Rect ReCalcuChildPos(Rect childPos, Rect pos)
+        {
+            var w = childPos.width;
+            var h = childPos.height;
+            childPos.x = this.position.xMax + 5;
+            childPos.y = this.position.y + pos.y;
+            childPos.width = w;
+            childPos.height = h;
+            return childPos;
         }
         
         protected object m_target;

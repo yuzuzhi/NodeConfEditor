@@ -51,7 +51,7 @@ namespace cfeditor
                 //if (fieldLink.linkNode != null)
                 {
                     Rect curvStart = position;
-                    curvStart.yMin += (i + 1) * kSingleLineHeight;
+                    curvStart.y += (i + 1) * kSingleLineHeight;
                     curvStart.height = kSingleLineHeight;
                     DrawNodeCurve(this, fieldLink.linkNode, curvStart, delegate(ref CurveDraw draw)
                     {

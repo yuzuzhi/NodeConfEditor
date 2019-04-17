@@ -62,8 +62,8 @@ namespace cfeditor
             {
                 var curveDraw = m_curveDraw[i];
                 Rect rc = new Rect();
-                rc.xMin = curveDraw.start.x;
-                rc.yMin = curveDraw.start.y - Node.kSingleLineHeight * 0.5f;
+                rc.x = curveDraw.start.x;
+                rc.y = curveDraw.start.y - Node.kSingleLineHeight * 0.5f;
                 rc.width = Node.kSingleLineHeight;
                 rc.height = Node.kSingleLineHeight;
                 bool btnShow = GUI.Button(rc, curveDraw.endNode != null && curveDraw.endNode.visiable ? "-" : "+");
