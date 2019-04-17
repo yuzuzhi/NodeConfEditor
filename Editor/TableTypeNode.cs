@@ -49,7 +49,7 @@ namespace cfeditor
 
                 bool bchanged = false;
                 object newValue = null;
-                if (DrawBaseObject(fieldInfo.Name, fieldValue, fieldInfo.FieldType, ref newValue,
+                if (NodeUtils.DrawBaseObject(fieldInfo.Name, fieldValue, fieldInfo.FieldType, ref newValue,
                     ref bchanged))
                 {
                     if (bchanged)
@@ -89,6 +89,7 @@ namespace cfeditor
                             else
                                 fieldLink.linkNode = new BaseListTypeNode(increasingIdent++, parent, fieldValue as IList);
                             fieldLink.linkNode.SetPosition = ReCalcuChildPos(fieldLink.linkNode.position, curvStart);
+                            this.AddChild(fieldLink.linkNode);
                             draw.endNode = fieldLink.linkNode;
                             parent.add(fieldLink.linkNode);
                         }
@@ -107,6 +108,7 @@ namespace cfeditor
                             fieldLink.linkNode = new ObjReferenceTypeNode(increasingIdent++, parent,
                                 (ScriptableObject) objref.target);
                             fieldLink.linkNode.SetPosition = ReCalcuChildPos(fieldLink.linkNode.position, curvStart);
+                            this.AddChild(fieldLink.linkNode);
                             draw.endNode = fieldLink.linkNode;
                             parent.add(fieldLink.linkNode);
                         }
@@ -132,6 +134,7 @@ namespace cfeditor
                         {
                             fieldLink.linkNode = new TableTypeNode(increasingIdent++, parent, fieldValue);
                             fieldLink.linkNode.SetPosition = ReCalcuChildPos(fieldLink.linkNode.position, curvStart);
+                            this.AddChild(fieldLink.linkNode);
                             draw.endNode = fieldLink.linkNode;
                             parent.add(fieldLink.linkNode);
                         }

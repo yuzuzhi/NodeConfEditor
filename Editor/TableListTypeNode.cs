@@ -24,7 +24,7 @@ namespace cfeditor
             var itemType = listObj.GetType().GetGenericArguments()[0];
             int insertIndex = -1, removeIndex = -1;
 
-            DrawListObject(listObj, ref insertIndex, ref removeIndex, delegate (int i)
+            NodeUtils.DrawListObject(listObj, ref insertIndex, ref removeIndex, delegate (int i)
             {
                 var listItemValue = listObj[i];
                 
@@ -43,6 +43,7 @@ namespace cfeditor
                     {
                         fieldLink.linkNode = new TableTypeNode(increasingIdent++, parent, listItemValue);
                             fieldLink.linkNode.SetPosition = ReCalcuChildPos(fieldLink.linkNode.position, curvStart);
+                        this.AddChild(fieldLink.linkNode);
                         draw.endNode = fieldLink.linkNode;
                         parent.add(fieldLink.linkNode);
                     }

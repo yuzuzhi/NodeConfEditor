@@ -121,13 +121,28 @@ namespace cfeditor
 
             GUILayout.Label(m_continer.Count.ToString());
             BeginWindows();
-            if (m_continer != null)
+            if (m_continer != null&& m_continer.Count!=0)
             {
-                for (int i = 0; i < m_continer.Count; i++)
+                //for (int i = 0; i < m_continer.Count; i++)
+                //{
+                //    var tableTypeNode = m_continer.GetByIndex(i);
+                //    if (tableTypeNode.visiable)
+                //        tableTypeNode.OnGUI();
+                //}
+                Queue<Node> drawQueue = new Queue<Node>();
+                drawQueue.Enqueue(m_continer.GetByIndex(0));
+
+                while (drawQueue.Count!=0)
                 {
-                    var tableTypeNode = m_continer.GetByIndex(i);
-                    if (tableTypeNode.visiable)
-                        tableTypeNode.OnGUI();
+                    var node = drawQueue.Dequeue();
+                    node.OnGUI();
+                    for (int i = 0; i < node.childrenCount; i++)
+                    {
+                        var child = node.GetChild(i);
+                        if (!child.visiable)
+                            continue;
+                        drawQueue.Enqueue(child);
+                    }
                 }
             }
 

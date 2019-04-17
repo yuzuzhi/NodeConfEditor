@@ -23,14 +23,14 @@ namespace cfeditor
             var itemType = listObj.GetType().GetGenericArguments()[0];
             int insertIndex = -1, removeIndex = -1;
             
-            DrawListObject(listObj, ref insertIndex, ref removeIndex, delegate(int i)
+            NodeUtils.DrawListObject(listObj, ref insertIndex, ref removeIndex, delegate(int i)
             {
                 var listItemValue = listObj[i];
 
                 bool bListItemChnged = false;
                 string label = string.Format("[{0}]", i);
                 object newValue = null;
-                DrawBaseObject(label, listItemValue, itemType, ref newValue, ref bListItemChnged);
+                NodeUtils.DrawBaseObject(label, listItemValue, itemType, ref newValue, ref bListItemChnged);
                 if (bListItemChnged)
                 {
                     listObj[i] = newValue;

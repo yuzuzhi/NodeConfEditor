@@ -55,6 +55,121 @@ namespace cfeditor
         public static GUIContent gcDrag = new GUIContent("", "drag to resize");
     }
 
+
+    public static class NodeUtils
+    {
+        public delegate void OnDrawListItem(int i);
+
+        public static void DrawListObject(IList listObj, ref int insertIndex, ref int removeIndex, OnDrawListItem drawer)
+        {
+            if (listObj.Count == 0)
+            {
+                if (GUILayout.Button("+", GUILayout.Width(20)))
+                    insertIndex = 0;
+            }
+
+            var oldLabelWidth = EditorGUIUtility.labelWidth;
+            EditorGUIUtility.labelWidth = 40;
+
+            for (int i = 0; i < listObj.Count; i++)
+            {
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    if (drawer != null)
+                        drawer(i);
+                    if (GUILayout.Button("+", EditorStyles.miniButtonLeft, GUILayout.Width(20)))
+                        insertIndex = i;
+                    if (GUILayout.Button("-", EditorStyles.miniButtonRight, GUILayout.Width(20)))
+                        removeIndex = i;
+                }
+            }
+
+            EditorGUIUtility.labelWidth = oldLabelWidth;
+
+        }
+
+        public static bool DrawBaseObject(string strLabelText, object oldValue, Type objType, ref object newValue, ref bool hasChanged)
+        {
+            newValue = null;
+            if (typeof(float) == objType)
+            {
+                newValue = (object)EditorGUILayout.FloatField(strLabelText, (float)oldValue);
+                if (!newValue.Equals(oldValue)) hasChanged = true;
+                return true;
+            }
+            if (typeof(bool) == objType)
+            {
+                newValue = EditorGUILayout.Toggle(strLabelText, (bool)oldValue);
+                if (!newValue.Equals(oldValue)) hasChanged = true;
+                return true;
+            }
+            if (typeof(int) == objType)
+            {
+                newValue = EditorGUILayout.IntField(strLabelText, (int)oldValue);
+                if (!newValue.Equals(oldValue)) hasChanged = true;
+                return true;
+            }
+            if (objType.IsEnum)
+            {
+                newValue = EditorGUILayout.EnumPopup(strLabelText, (Enum)oldValue);
+                if (!newValue.Equals(oldValue)) hasChanged = true;
+                return true;
+            }
+
+            if (typeof(string) == objType)
+            {
+                if (oldValue == null) oldValue = "";
+                newValue = EditorGUILayout.TextField(strLabelText, (string)oldValue);
+                if (!newValue.Equals(oldValue)) hasChanged = true;
+                return true;
+            }
+            if (objType.Is<Vector3>())
+            {
+                newValue = EditorGUILayout.Vector3Field(strLabelText, (Vector3)oldValue);
+                if (!newValue.Equals(oldValue)) hasChanged = true;
+                return true;
+            }
+
+            return false;
+        }
+
+
+        public static Rect ResizeWindow(Rect windowRect, ref bool isResizing, ref Rect resizeStart,
+            Vector2 minWindowSize)
+        {
+            Vector2 mouse =
+                GUIUtility.ScreenToGUIPoint(new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y));
+            Rect r = GUILayoutUtility.GetRect(GUIContents.gcDrag, Styles.styleWindowResize);
+            if (Event.current.type == EventType.MouseDown)
+            {
+                bool c = r.Contains(mouse);
+                isResizing = true;
+                resizeStart = new Rect(mouse.x, mouse.y, windowRect.width, windowRect.height);
+                //Event.current.Use();  // the GUI.Button below will eat the event, and this way it will show its active state
+            }
+            else if (Event.current.type == EventType.MouseUp && isResizing)
+            {
+                isResizing = false;
+            }
+            else if (!Input.GetMouseButton(0))
+            {
+                // if the mouse is over some other window we won't get an event, this just kind of circumvents that by checking the button state directly
+                isResizing = false;
+            }
+            else if (isResizing)
+            {
+                windowRect.width = Mathf.Max(minWindowSize.x, resizeStart.width + (mouse.x - resizeStart.x));
+                windowRect.height = Mathf.Max(minWindowSize.y, resizeStart.height + (mouse.y - resizeStart.y));
+                windowRect.xMax = Mathf.Min(Screen.width, windowRect.xMax); // modifying xMax affects width, not x
+                windowRect.yMax = Mathf.Min(Screen.height, windowRect.yMax); // modifying yMax affects height, not y
+            }
+            GUI.Button(r, mouse.ToString()/*GUIContents.gcDrag, Styles.styleWindowResize*/);
+            return windowRect;
+        }
+
+    }
+
+
     public class Node
     {
         protected class LinkedInfo
@@ -91,6 +206,22 @@ namespace cfeditor
         public Rect position { get { return m_position; } }
         public Rect SetPosition { set { m_position = value; } }
 
+        public int childrenCount { get { return m_children.Count; } }
+        public Node GetChild(int index)
+        {
+            return m_children[index];
+        }
+
+        public void AddChild(Node child)
+        {
+            m_children.Add(child);
+        }
+
+        public void RemoveChild(Node child)
+        {
+            m_children.Remove(child);
+        }
+
         public void OnGUI()
         {
             m_position = HorizResizer(m_position); //right
@@ -116,39 +247,6 @@ namespace cfeditor
         }
 
         public bool hasChanged { get { return m_hasChanged; } }
-
-        public static Rect ResizeWindow(Rect windowRect, ref bool isResizing, ref Rect resizeStart,
-            Vector2 minWindowSize)
-        {
-            Vector2 mouse =
-                GUIUtility.ScreenToGUIPoint(new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y));
-            Rect r = GUILayoutUtility.GetRect(GUIContents.gcDrag, Styles.styleWindowResize);
-            if (Event.current.type == EventType.MouseDown)
-            {
-                bool c = r.Contains(mouse);
-                isResizing = true;
-                resizeStart = new Rect(mouse.x, mouse.y, windowRect.width, windowRect.height);
-                //Event.current.Use();  // the GUI.Button below will eat the event, and this way it will show its active state
-            }
-            else if (Event.current.type == EventType.MouseUp && isResizing)
-            {
-                isResizing = false;
-            }
-            else if (!Input.GetMouseButton(0))
-            {
-                // if the mouse is over some other window we won't get an event, this just kind of circumvents that by checking the button state directly
-                isResizing = false;
-            }
-            else if (isResizing)
-            {
-                windowRect.width = Mathf.Max(minWindowSize.x, resizeStart.width + (mouse.x - resizeStart.x));
-                windowRect.height = Mathf.Max(minWindowSize.y, resizeStart.height + (mouse.y - resizeStart.y));
-                windowRect.xMax = Mathf.Min(Screen.width, windowRect.xMax); // modifying xMax affects width, not x
-                windowRect.yMax = Mathf.Min(Screen.height, windowRect.yMax); // modifying yMax affects height, not y
-            }
-            GUI.Button(r, mouse.ToString()/*GUIContents.gcDrag, Styles.styleWindowResize*/);
-            return windowRect;
-        }
 
         private float ttt;
         private Rect HorizResizer(Rect window, bool right = true, float detectionRange = 8f)
@@ -232,84 +330,7 @@ namespace cfeditor
             curvStart.width = kSingleLineHeight;
             return curvStart;
         }
-
-
-        public delegate void OnDrawListItem(int i);
-        public delegate void OnDrawListItemEnd(int i, int insertIndex, int removeIndex);
-        protected static void DrawListObject(IList listObj, ref int insertIndex, ref int removeIndex, OnDrawListItem drawer)
-        {
-            if (listObj.Count == 0)
-            {
-                if (GUILayout.Button("+", GUILayout.Width(20)))
-                    insertIndex = 0;
-            }
-
-            var oldLabelWidth = EditorGUIUtility.labelWidth;
-            EditorGUIUtility.labelWidth = 40;
-
-            for (int i = 0; i < listObj.Count; i++)
-            {   
-                using (new EditorGUILayout.HorizontalScope())
-                {
-                    if (drawer != null)
-                        drawer(i);
-                    if (GUILayout.Button("+", EditorStyles.miniButtonLeft, GUILayout.Width(20)))
-                        insertIndex = i;
-                    if (GUILayout.Button("-", EditorStyles.miniButtonRight, GUILayout.Width(20)))
-                        removeIndex = i;
-                }
-            }
-
-            EditorGUIUtility.labelWidth = oldLabelWidth;
-
-        }
-
-        protected static bool DrawBaseObject(string strLabelText, object oldValue, Type objType, ref object newValue, ref bool hasChanged)
-        {
-            newValue = null;
-            if (typeof(float) == objType)
-            {
-                newValue = (object)EditorGUILayout.FloatField(strLabelText, (float)oldValue);
-                if (!newValue.Equals(oldValue)) hasChanged = true;
-                return true;
-            }
-            if (typeof(bool) == objType)
-            {
-                newValue = EditorGUILayout.Toggle(strLabelText, (bool)oldValue);
-                if (!newValue.Equals(oldValue)) hasChanged = true;
-                return true;
-            }
-            if (typeof(int) == objType)
-            {
-                newValue = EditorGUILayout.IntField(strLabelText, (int)oldValue);
-                if (!newValue.Equals(oldValue)) hasChanged = true;
-                return true;
-            }
-            if (objType.IsEnum)
-            {
-                newValue = EditorGUILayout.EnumPopup(strLabelText, (Enum)oldValue);
-                if (!newValue.Equals(oldValue)) hasChanged = true;
-                return true;
-            }
-
-            if (typeof(string) == objType)
-            {
-                if (oldValue == null) oldValue = "";
-                newValue = EditorGUILayout.TextField(strLabelText, (string)oldValue);
-                if (!newValue.Equals(oldValue)) hasChanged = true;
-                return true;
-            }
-            if (objType.Is<Vector3>())
-            {
-                newValue = EditorGUILayout.Vector3Field(strLabelText, (Vector3)oldValue);
-                if (!newValue.Equals(oldValue)) hasChanged = true;
-                return true;
-            }
-
-            return false;
-        }
-
-
+        
         protected NodeContiner parent { get { return m_parent; } }
 
         protected static int increasingIdent = 10001;
@@ -325,6 +346,8 @@ namespace cfeditor
 
         bool isResizing = false;
         Rect resizeStart = new Rect();
+
+        List<Node> m_children = new List<Node>();
     }
 
 }
