@@ -74,6 +74,7 @@ namespace cfeditor
         {
             m_id = id;
             m_parent = parent;
+            m_name = this.GetType().Name;
         }
 
         public Vector2 center
@@ -208,10 +209,19 @@ namespace cfeditor
         
         protected void DrawNodeCurve(Node s, Node e, Rect start, NodeContiner.OnLinkBtn call)
         {
-            Vector3 startPos = new Vector3(start.x + start.width, start.y + start.height / 2, 0);
+            Vector3 startPos = new Vector3(start.x, start.y + start.height/2, 0);
             m_parent.DrawCurve(s, e, startPos, call);
         }
 
+        protected Rect CalcuControlRect(int index, Type t)
+        {
+            Rect curvStart = position;
+            curvStart.x = position.x + position.width;
+            curvStart.y += (index + 1) * (kSingleLineHeight + EditorGUIUtility.standardVerticalSpacing);
+            curvStart.height = kSingleLineHeight;
+            curvStart.width = kSingleLineHeight;
+            return curvStart;
+        }
 
 
         public delegate void OnDrawListItem(int i);

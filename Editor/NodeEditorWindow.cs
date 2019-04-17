@@ -64,13 +64,15 @@ namespace cfeditor
                 Rect rc = new Rect();
                 rc.x = curveDraw.start.x;
                 rc.y = curveDraw.start.y - Node.kSingleLineHeight * 0.5f;
-                rc.width = Node.kSingleLineHeight;
+                rc.width = Node.kSingleLineHeight + 2;
                 rc.height = Node.kSingleLineHeight;
-                bool btnShow = GUI.Button(rc, curveDraw.endNode != null && curveDraw.endNode.visiable ? "-" : "+");
+                bool btnShow = GUI.Button(rc, curveDraw.endNode != null && curveDraw.endNode.visiable ? ">" : "<",
+                    EditorStyles.miniButtonRight);
                 if (btnShow)
                 {
+                    if (curveDraw.endNode != null)
+                        curveDraw.endNode.visiable = !curveDraw.endNode.visiable;
                     curveDraw.call(ref curveDraw);
-                    curveDraw.endNode.visiable = !curveDraw.endNode.visiable;
                 }
                 if (curveDraw.endNode != null && curveDraw.endNode.visiable)
                 {
@@ -116,6 +118,8 @@ namespace cfeditor
         void OnGUI()
         {
             m_continer.window = this;
+
+            GUILayout.Label(m_continer.Count.ToString());
             BeginWindows();
             if (m_continer != null)
             {

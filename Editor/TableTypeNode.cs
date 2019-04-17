@@ -45,6 +45,8 @@ namespace cfeditor
                 var fieldInfo = fieldsList[i];
                 var fieldValue = fieldInfo.GetValue(m_target);
 
+                Rect curvStart = CalcuControlRect(i, fieldInfo.FieldType);
+
                 bool bchanged = false;
                 object newValue = null;
                 if (DrawBaseObject(fieldInfo.Name, fieldValue, fieldInfo.FieldType, ref newValue,
@@ -58,48 +60,58 @@ namespace cfeditor
                     continue;
                 }
 
-                Rect rect = EditorGUILayout.GetControlRect(true);
-                Rect r = rect;
-                GUI.Label(r, fieldInfo.Name);
-                int btnWid = 30;
-                int edgeWid = 0;
-                r.xMin = r.xMax - btnWid - edgeWid;
-                r.width = btnWid;
+                //Rect rect = EditorGUILayout.GetControlRect(true);
+                //Rect r = rect;
+                //GUI.Label(r, fieldInfo.Name);
+                //int btnWid = 30;
+                //int edgeWid = 0;
+                //r.xMin = r.xMax - btnWid - edgeWid;
+                //r.width = btnWid;
                 LinkedInfo fieldLink = null;
                 if (!m_childrenByField.TryGetValue(fieldInfo, out fieldLink))
                 {
                     fieldLink = new LinkedInfo();
                     m_childrenByField.Add(fieldInfo, fieldLink);
                 }
-                bool btnShow = GUI.Button(r, fieldLink != null && fieldLink.visiable ? "-" : "+", EditorStyles.miniButton);
-                if (btnShow)
-                    fieldLink.visiable = !fieldLink.visiable;
+
+                NodeContiner.OnLinkBtn call = null;
                 if (fieldInfo.FieldType.IsList())
                 {
-                    if (btnShow && fieldLink.visiable && fieldLink.linkNode == null)
+                    var listValue = fieldValue as IList;
+                    call = delegate(ref CurveDraw draw)
                     {
-                        bool isClassObjItem = fieldInfo.FieldType.GetGenericArguments()[0].IsTable();
-                        if (isClassObjItem)
-                            fieldLink.linkNode = new TableListTypeNode(increasingIdent++, parent, fieldValue as IList);
-                        else
-                            fieldLink.linkNode = new BaseListTypeNode(increasingIdent++, parent, fieldValue as IList);
-                        parent.add(fieldLink.linkNode);
-                    }
+                        if (fieldLink.linkNode == null)
+                        {
+                            bool isClassObjItem = fieldInfo.FieldType.GetGenericArguments()[0].IsTable();
+                            if (isClassObjItem)
+                                fieldLink.linkNode = new TableListTypeNode(increasingIdent++, parent,
+                                    fieldValue as IList);
+                            else
+                                fieldLink.linkNode = new BaseListTypeNode(increasingIdent++, parent, fieldValue as IList);
+                            draw.endNode = fieldLink.linkNode;
+                            parent.add(fieldLink.linkNode);
+                        }
+                    };
+
+                    EditorGUILayout.TextField(fieldInfo.Name, "List " + listValue.Count);
                 }
                 else if (fieldInfo.IsObjReference())
                 {
                     var objref = (ObjReference)fieldValue;
 
-                    if (btnShow && fieldLink.visiable && fieldLink.linkNode == null)
+                    call = delegate(ref CurveDraw draw)
                     {
-                        fieldLink.linkNode = new ObjReferenceTypeNode(increasingIdent++, parent,
-                            (ScriptableObject) objref.target);
-                        parent.add(fieldLink.linkNode);
-                    }
-
-                    r.xMin = EditorGUIUtility.labelWidth;
-                    r.width = rect.width - r.xMin - btnWid;
-                    var newObj = EditorGUI.ObjectField(r, objref.target, typeof (ScriptableObject),
+                        if (fieldLink.linkNode == null)
+                        {
+                            fieldLink.linkNode = new ObjReferenceTypeNode(increasingIdent++, parent,
+                                (ScriptableObject) objref.target);
+                            draw.endNode = fieldLink.linkNode;
+                            parent.add(fieldLink.linkNode);
+                        }
+                    };
+                    //r.xMin = EditorGUIUtility.labelWidth;
+                    //r.width = rect.width - r.xMin - btnWid;
+                    var newObj = EditorGUILayout.ObjectField(fieldInfo.Name,objref.target, typeof (ScriptableObject),
                         false);
                     if (newObj != objref.target)
                     {
@@ -112,28 +124,22 @@ namespace cfeditor
                 }
                 else if (fieldInfo.IsTable())
                 {
-                    if (btnShow && fieldLink.visiable && fieldLink.linkNode == null)
+                    call = delegate(ref CurveDraw draw)
                     {
-                        fieldLink.linkNode = new TableTypeNode(increasingIdent++, parent, fieldValue);
-                        fieldLink.linkNode.SetPosition = ReCalcuChildPos(fieldLink.linkNode.position, r);
-                        parent.add(fieldLink.linkNode);
-                    }
-                }
-
-                if (fieldLink.linkNode != null)
-                    fieldLink.linkNode.visiable = fieldLink.visiable;
-                
-                if (fieldLink.linkNode != null && fieldLink.visiable)
-                {
-                    Rect curvStart = position;
-                    curvStart.x = position.xMin + position.width;
-                    curvStart.y += (i + 1)*kSingleLineHeight;
-                    curvStart.height = kSingleLineHeight;
-                    curvStart.width = kSingleLineHeight;
-                    DrawNodeCurve(this, fieldLink.linkNode, curvStart, null);
+                        if (fieldLink.linkNode == null)
+                        {
+                            fieldLink.linkNode = new TableTypeNode(increasingIdent++, parent, fieldValue);
+                            fieldLink.linkNode.SetPosition = ReCalcuChildPos(fieldLink.linkNode.position, curvStart);
+                            draw.endNode = fieldLink.linkNode;
+                            parent.add(fieldLink.linkNode);
+                        }
+                    };
+                    EditorGUILayout.TextField(fieldInfo.Name, fieldInfo.FieldType.Name);
                 }
 
 
+
+                DrawNodeCurve(this, fieldLink.linkNode, curvStart, call);
             }
         }
 
@@ -142,7 +148,7 @@ namespace cfeditor
             var w = childPos.width;
             var h = childPos.height;
             childPos.x = this.position.xMax + 5;
-            childPos.y = this.position.y + pos.y;
+            childPos.y = pos.y;
             childPos.width = w;
             childPos.height = h;
             return childPos;

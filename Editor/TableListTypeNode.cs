@@ -45,22 +45,19 @@ namespace cfeditor
                 int edgeWid = 0;
                 r.xMin = r.xMax - btnWid - edgeWid;
                 r.width = btnWid;
-                
-                
 
-                //if (fieldLink.linkNode != null)
+
+
+                Rect curvStart = CalcuControlRect(i, null);
+                DrawNodeCurve(this, fieldLink.linkNode, curvStart, delegate (ref CurveDraw draw)
                 {
-                    Rect curvStart = position;
-                    curvStart.y += (i + 1) * kSingleLineHeight;
-                    curvStart.height = kSingleLineHeight;
-                    DrawNodeCurve(this, fieldLink.linkNode, curvStart, delegate(ref CurveDraw draw)
+                    if (fieldLink.linkNode == null)
                     {
-                        if (fieldLink.linkNode == null)
-                            fieldLink.linkNode = new TableTypeNode(increasingIdent, parent, listItemValue);
+                        fieldLink.linkNode = new TableTypeNode(increasingIdent, parent, listItemValue);
                         draw.endNode = fieldLink.linkNode;
                         parent.add(fieldLink.linkNode);
-                    });
-                }
+                    }
+                });
 
 
                 if (fieldLink.linkNode!=null&& fieldLink.linkNode.hasChanged)
