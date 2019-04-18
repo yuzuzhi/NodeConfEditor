@@ -50,7 +50,7 @@ namespace cfeditor
                 bool bchanged = false;
                 object newValue = null;
                 if (NodeUtils.DrawBaseObject(fieldInfo.Name, fieldValue, fieldInfo.FieldType, ref newValue,
-                    ref bchanged))
+                    ref bchanged, ref m_heightStart))
                 {
                     if (bchanged)
                     {
@@ -59,14 +59,7 @@ namespace cfeditor
                     }
                     continue;
                 }
-
-                //Rect rect = EditorGUILayout.GetControlRect(true);
-                //Rect r = rect;
-                //GUI.Label(r, fieldInfo.Name);
-                //int btnWid = 30;
-                //int edgeWid = 0;
-                //r.xMin = r.xMax - btnWid - edgeWid;
-                //r.width = btnWid;
+                
                 LinkedInfo fieldLink = null;
                 if (!m_childrenByField.TryGetValue(fieldInfo, out fieldLink))
                 {
@@ -82,8 +75,11 @@ namespace cfeditor
                     {
                         if (fieldLink.linkNode == null)
                         {
-                            bool isClassObjItem = fieldInfo.FieldType.GetGenericArguments()[0].IsTable();
-                            if (isClassObjItem)
+                            var typeOfListItem = fieldInfo.FieldType.GetGenericArguments()[0];
+                            if (typeOfListItem.IsTable())
+                                fieldLink.linkNode = new TableListTypeNode(increasingIdent++, parent,
+                                    fieldValue as IList);
+                            else if(typeOfListItem.Is<ObjReference>())
                                 fieldLink.linkNode = new TableListTypeNode(increasingIdent++, parent,
                                     fieldValue as IList);
                             else
@@ -96,6 +92,7 @@ namespace cfeditor
                     };
 
                     EditorGUILayout.TextField(fieldInfo.Name, "List " + listValue.Count);
+                    incconmmonheightpos();
                 }
                 else if (fieldInfo.IsObjReference())
                 {
@@ -117,6 +114,7 @@ namespace cfeditor
                     //r.width = rect.width - r.xMin - btnWid;
                     var newObj = EditorGUILayout.ObjectField(fieldInfo.Name,objref.target, typeof (ScriptableObject),
                         false);
+                    incconmmonheightpos();
                     if (newObj != objref.target)
                     {
                         objref.target = newObj;
@@ -140,12 +138,15 @@ namespace cfeditor
                         }
                     };
                     EditorGUILayout.TextField(fieldInfo.Name, fieldInfo.FieldType.Name);
+                    incconmmonheightpos();
                 }
 
 
 
                 DrawNodeCurve(this, fieldLink.linkNode, curvStart, call);
             }
+
+
         }
 
         

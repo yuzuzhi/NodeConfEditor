@@ -18,6 +18,9 @@ namespace cfeditor
         public string name;
         public T data;
         public List<ScriptableObject> localOjbects;
+
+        public List<string> fieldName;
+        public List<List<ObjReference>> fieldValue;
     }
 
     public class ListObject<T> : ScriptableObject
@@ -49,14 +52,17 @@ namespace cfeditor
     [Serializable]
     public class Student
     {
+        public Infomation info;
         public string name;
         public int age;
+        public Vector3 vec3;
 
-        public Infomation info;
 
         public List<int> listInt = new List<int>();
         public List<string> liststr = new List<string>();
+        public List<Vector3> listVec3 = new List<Vector3>();
         public List<Infomation> listobj = new List<Infomation>();
+        public List<ObjReference> listrefer = new List<ObjReference>();
 
         public ObjReference refField;
     }

@@ -53,6 +53,11 @@ namespace cfeditor
         public static GUIStyle toolbarLabel = GUI.skin.FindStyle("toolbarButton");
         public static GUIStyle toolbarDropdown = GUI.skin.FindStyle("toolbarDropdown");
         public static GUIStyle toolbar = GUI.skin.FindStyle("toolbar");
+
+        public static float titleBarheight = 20;
+        public static float comnListNodeWidth = 100;
+        public static float objRfListNodeWidth = 200;
+
     }
 
     public static class GUIContents
@@ -93,29 +98,33 @@ namespace cfeditor
 
         }
 
-        public static bool DrawBaseObject(string strLabelText, object oldValue, Type objType, ref object newValue, ref bool hasChanged)
+        public static bool DrawBaseObject(string strLabelText, object oldValue, Type objType, ref object newValue, ref bool hasChanged, ref float height)
         {
             newValue = null;
             if (typeof(float) == objType)
             {
+                height += Node.kSingleLineHeight + EditorGUIUtility.standardVerticalSpacing;
                 newValue = (object)EditorGUILayout.FloatField(strLabelText, (float)oldValue);
                 if (!newValue.Equals(oldValue)) hasChanged = true;
                 return true;
             }
             if (typeof(bool) == objType)
             {
+                height += Node.kSingleLineHeight + EditorGUIUtility.standardVerticalSpacing;
                 newValue = EditorGUILayout.Toggle(strLabelText, (bool)oldValue);
                 if (!newValue.Equals(oldValue)) hasChanged = true;
                 return true;
             }
             if (typeof(int) == objType)
             {
+                height += Node.kSingleLineHeight + EditorGUIUtility.standardVerticalSpacing;
                 newValue = EditorGUILayout.IntField(strLabelText, (int)oldValue);
                 if (!newValue.Equals(oldValue)) hasChanged = true;
                 return true;
             }
             if (objType.IsEnum)
             {
+                height += Node.kSingleLineHeight + EditorGUIUtility.standardVerticalSpacing;
                 newValue = EditorGUILayout.EnumPopup(strLabelText, (Enum)oldValue);
                 if (!newValue.Equals(oldValue)) hasChanged = true;
                 return true;
@@ -123,6 +132,7 @@ namespace cfeditor
 
             if (typeof(string) == objType)
             {
+                height += Node.kSingleLineHeight + EditorGUIUtility.standardVerticalSpacing;
                 if (oldValue == null) oldValue = "";
                 newValue = EditorGUILayout.TextField(strLabelText, (string)oldValue);
                 if (!newValue.Equals(oldValue)) hasChanged = true;
@@ -130,7 +140,9 @@ namespace cfeditor
             }
             if (objType.Is<Vector3>())
             {
-                newValue = EditorGUILayout.Vector3Field(strLabelText, (Vector3)oldValue);
+                GUIContent label = new GUIContent(strLabelText);
+                height += EditorGUI.GetPropertyHeight(SerializedPropertyType.Vector3, label) + EditorGUIUtility.standardVerticalSpacing;
+                newValue = EditorGUILayout.Vector3Field(label, (Vector3)oldValue);
                 if (!newValue.Equals(oldValue)) hasChanged = true;
                 return true;
             }
@@ -273,7 +285,16 @@ namespace cfeditor
         void OnDrawWindow(int id)
         {
             GUI.DragWindow(new Rect(0, 0, 10000, 20));
+
+            m_heightStart = Styles.titleBarheight;
             OnDrawGUI();
+            
+            var wndrect = position;
+            if (wndrect.height < m_heightStart + 20)
+            {
+                wndrect.height = m_heightStart + 20;
+                SetPosition = wndrect;
+            }
         }
         
 
@@ -369,12 +390,18 @@ namespace cfeditor
 
         protected Rect CalcuControlRect(int index, Type t)
         {
+            //EditorGUI.GetPropertyHeight(SerializedPropertyType.Vector3, label)
             Rect curvStart = position;
             curvStart.x = position.x + position.width;
-            curvStart.y += m_controlStartY + (index + 1)*(kSingleLineHeight + EditorGUIUtility.standardVerticalSpacing);
+            curvStart.y += m_heightStart;//+= m_controlStartY + (index + 1)*(kSingleLineHeight + EditorGUIUtility.standardVerticalSpacing);
             curvStart.height = kSingleLineHeight;
             curvStart.width = kSingleLineHeight;
             return curvStart;
+        }
+
+        protected void incconmmonheightpos()
+        {
+            m_heightStart += kSingleLineHeight + EditorGUIUtility.standardVerticalSpacing;
         }
         
         protected NodeContiner parent { get { return m_parent; } }
@@ -384,7 +411,7 @@ namespace cfeditor
         private int m_id;
         protected float m_controlStartY = 0;
         NodeContiner m_parent;
-        Rect m_position = new Rect(10, 30, 200, 200);
+        private Rect m_position = new Rect(10, 30, 300, Styles.titleBarheight + 10);
         bool m_draggingLeft = false;
         bool m_draggingRight = false;
         private string m_name;
@@ -400,6 +427,7 @@ namespace cfeditor
         private Node m_nextnode;
 
         bool m_canResize;
+        protected float m_heightStart;
     }
 
 }

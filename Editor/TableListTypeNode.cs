@@ -13,10 +13,11 @@ namespace cfeditor
         public TableListTypeNode(int id, NodeContiner parent, IList target): base(id, parent)
         {
             m_target = target;
+
+            var itemType = m_target.GetType().GetGenericArguments()[0];
             var p = position;
-            p.width = 100;
+            p.width = itemType.Is<ObjReference>() ? Styles.objRfListNodeWidth : Styles.comnListNodeWidth;
             SetPosition = p;
-            ResizeHeight();
         }
 
         public override void OnDrawGUI()
@@ -31,34 +32,55 @@ namespace cfeditor
             NodeUtils.DrawListObject(listObj, ref insertIndex, ref removeIndex, delegate (int i)
             {
                 var listItemValue = listObj[i];
-                
+                Rect curvStart = CalcuControlRect(i, null);
+
                 if (i >= m_nodeOfItems.Count)
                     m_nodeOfItems.Add(null);
                 var fieldLink = m_nodeOfItems[i];
                 if (fieldLink == null)
                     fieldLink = m_nodeOfItems[i] = new LinkedInfo();
-
-                GUILayout.Label(string.Format("[{0}]", i), GUILayout.Width(EditorGUIUtility.labelWidth));
-
-                Rect curvStart = CalcuControlRect(i, null);
+                
                 DrawNodeCurve(this, fieldLink.linkNode, curvStart, delegate (ref CurveDraw draw)
                 {
                     if (fieldLink.linkNode == null)
                     {
-                        fieldLink.linkNode = new TableTypeNode(increasingIdent++, parent, listItemValue);
-                            fieldLink.linkNode.SetPosition = ReCalcuChildPos(fieldLink.linkNode.position, curvStart);
+                        if (itemType.Is<ObjReference>())
+                        {
+                            var objRefer = (ObjReference) listItemValue;
+                            fieldLink.linkNode = new ObjReferenceTypeNode(increasingIdent++, parent,
+                                (ScriptableObject) objRefer.target);
+                        }
+                        else
+                            fieldLink.linkNode = new TableTypeNode(increasingIdent++, parent, listItemValue);
+                        fieldLink.linkNode.SetPosition = ReCalcuChildPos(fieldLink.linkNode.position, curvStart);
                         this.AddChild(fieldLink.linkNode);
                         draw.endNode = fieldLink.linkNode;
                         parent.add(fieldLink.linkNode);
                     }
                 });
 
-
-                if (fieldLink.linkNode != null && fieldLink.linkNode.hasChanged)
+                if (itemType.Is<ObjReference>())
                 {
-                    SetChanged();
+                    var objRefer = (ObjReference)listItemValue;
+                    var strLabel = string.Format("[{0}]", i);
+                    var newObj = EditorGUILayout.ObjectField(strLabel, objRefer.target, typeof (ScriptableObject), false);
+                    incconmmonheightpos();
+                    if (newObj != objRefer.target)
+                    {
+                        objRefer.target = newObj;
+                        m_target[i] = objRefer;
+                        if (fieldLink.linkNode != null)
+                            ((ObjReferenceTypeNode)fieldLink.linkNode).Reset((ScriptableObject)objRefer.target);
+                        SetChanged();
+                    }
                 }
-
+                else
+                {
+                    GUILayout.Label(string.Format("[{0}]", i), GUILayout.Width(EditorGUIUtility.labelWidth));
+                    incconmmonheightpos();
+                    if (fieldLink.linkNode != null && fieldLink.linkNode.hasChanged)
+                        SetChanged();
+                }
             });
 
 
@@ -73,7 +95,6 @@ namespace cfeditor
                     addingObj = Activator.CreateInstance(defType);
                 listObj.Insert(insertIndex, addingObj);
                 SetChanged();
-                ResizeHeight();
             }
             if (removeIndex != -1)
             {
@@ -83,20 +104,9 @@ namespace cfeditor
                 m_nodeOfItems.RemoveAt(removeIndex);
                 listObj.RemoveAt(removeIndex);
                 SetChanged();
-                ResizeHeight();
             }
         }
-
-        void ResizeHeight()
-        {
-            if (m_target == null)
-                return;
-            var p = position;
-            int listCount = m_target != null ? m_target.Count : 0;
-            int count = Mathf.Max(listCount, 1);
-            p.height = (count + 2) * (kSingleLineHeight + EditorGUIUtility.standardVerticalSpacing);
-            SetPosition = p;
-        }
+        
 
 
         IList m_target;

@@ -37,7 +37,7 @@ namespace cfeditor
             float edgwid = 5;
             rect.x = position.width - btnwid - edgwid;
             rect.width = btnwid;
-            m_controlStartY = kSingleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+            m_heightStart = Styles.titleBarheight + kSingleLineHeight + EditorGUIUtility.standardVerticalSpacing;
             if (GUI.Button(rect, "S", EditorStyles.miniButtonRight))
             {
                 AssetDatabase.SaveAssets();
