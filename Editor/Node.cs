@@ -369,8 +369,6 @@ namespace cfeditor
 
         protected Rect CalcuControlRect(int index, Type t)
         {
-            var lastRect = GUILayoutUtility.GetLastRect();
-
             Rect curvStart = position;
             curvStart.x = position.x + position.width;
             curvStart.y += m_controlStartY + (index + 1)*(kSingleLineHeight + EditorGUIUtility.standardVerticalSpacing);
