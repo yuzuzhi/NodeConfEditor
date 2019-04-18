@@ -11,7 +11,4 @@ namespace cfeditor.astdata
     public class TestClassConfObject : TableObject<TestClass>
     {
     }
-    public class DoorClassConfObject : TableObject<Door>
-    {
-    }
 }
