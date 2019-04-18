@@ -3,21 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace cfeditor
+namespace cfeditor.astdata
 {
-
-    namespace astdata
+    public class StudentConfObject : TableObject<Student>
     {
-        public class StudentConfObject : TableObject<Student>
-        {
-        }
-
-
-        public class TestClassConfObject : TableObject<TestClass>
-        {
-            
-        }
-
     }
-
+    public class TestClassConfObject : TableObject<TestClass>
+    {
+    }
+    public class DoorClassConfObject : TableObject<Door>
+    {
+    }
 }

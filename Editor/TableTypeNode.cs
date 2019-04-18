@@ -18,6 +18,8 @@ namespace cfeditor
         public TableTypeNode(int id, NodeContiner parent, object target):base(id, parent, true)
         {
             m_target = target;
+            if (m_target != null)
+                SetName = Ctrl.GetNodeTitle(m_target);
         }
 
 
@@ -45,11 +47,16 @@ namespace cfeditor
                 var fieldInfo = fieldsList[i];
                 var fieldValue = fieldInfo.GetValue(m_target);
 
+                if (!Ctrl.FieldVisible(m_target, fieldInfo))
+                    continue;
+                var label = Ctrl.GetFieldLabel(m_target, fieldInfo);
+
                 Rect curvStart = CalcuControlRect(i, fieldInfo.FieldType);
+
 
                 bool bchanged = false;
                 object newValue = null;
-                if (NodeUtils.DrawBaseObject(fieldInfo.Name, fieldValue, fieldInfo.FieldType, ref newValue,
+                if (NodeUtils.DrawBaseObject(label, fieldValue, fieldInfo.FieldType, ref newValue,
                     ref bchanged, ref m_heightStart))
                 {
                     if (bchanged)
@@ -84,6 +91,7 @@ namespace cfeditor
                                     fieldValue as IList);
                             else
                                 fieldLink.linkNode = new BaseListTypeNode(increasingIdent++, parent, fieldValue as IList);
+                            fieldLink.linkNode.SetName = "列表";
                             fieldLink.linkNode.SetPosition = ReCalcuChildPos(fieldLink.linkNode.position, curvStart);
                             this.AddChild(fieldLink.linkNode);
                             draw.endNode = fieldLink.linkNode;
@@ -91,7 +99,7 @@ namespace cfeditor
                         }
                     };
 
-                    EditorGUILayout.TextField(fieldInfo.Name, "List " + listValue.Count);
+                    EditorGUILayout.TextField(label, "List " + listValue.Count);
                     inccomnheightpos();
                 }
                 else if (fieldInfo.IsObjReference())
@@ -112,7 +120,7 @@ namespace cfeditor
                     };
                     //r.xMin = EditorGUIUtility.labelWidth;
                     //r.width = rect.width - r.xMin - btnWid;
-                    var newObj = EditorGUILayout.ObjectField(fieldInfo.Name,objref.target, typeof (ScriptableObject),
+                    var newObj = EditorGUILayout.ObjectField(label,objref.target, typeof (ScriptableObject),
                         false);
                     inccomnheightpos();
                     if (newObj != objref.target)
@@ -137,14 +145,14 @@ namespace cfeditor
                             parent.add(fieldLink.linkNode);
                         }
                     };
-                    EditorGUILayout.TextField(fieldInfo.Name, fieldInfo.FieldType.Name);
+                    EditorGUILayout.TextField(label, fieldInfo.FieldType.Name);
                     inccomnheightpos();
                 }
 
 
 
                 DrawNodeCurve(this, fieldLink.linkNode, curvStart, call);
-            }
+            }   //End-for field list
 
 
         }

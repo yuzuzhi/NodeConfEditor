@@ -28,7 +28,7 @@ namespace cfeditor
                 var listItemValue = listObj[i];
 
                 bool bListItemChnged = false;
-                string label = string.Format("[{0}]", i);
+                var label = new GUIContent(string.Format("[{0}]", i));
                 object newValue = null;
                 NodeUtils.DrawBaseObject(label, listItemValue, itemType, ref newValue, ref bListItemChnged,
                     ref m_heightStart);

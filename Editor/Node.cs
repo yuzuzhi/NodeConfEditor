@@ -43,6 +43,27 @@ namespace cfeditor
         {
             return t.FieldType == typeof (ObjReference);
         }
+
+        public static bool GetAttribute<T>(this FieldInfo field, ref T res)
+        {
+            var attr = field.GetCustomAttributes(typeof(T), false);
+            if (attr == null || attr.Length == 0)
+                return false;
+
+            res = (T)attr[0];
+
+            return true;
+        }
+
+        public static bool GetAttribute<T>(this Type type, ref T res)
+        {
+            var attr = type.GetCustomAttributes(typeof(T), false);
+            if (attr == null || attr.Length == 0)
+                return false;
+
+            res = (T)attr[0];
+            return true;
+        }
     }
 
     public static class Styles
@@ -98,7 +119,7 @@ namespace cfeditor
 
         }
 
-        public static bool DrawBaseObject(string strLabelText, object oldValue, Type objType, ref object newValue, ref bool hasChanged, ref float height)
+        public static bool DrawBaseObject(GUIContent strLabelText, object oldValue, Type objType, ref object newValue, ref bool hasChanged, ref float height)
         {
             newValue = null;
             if (typeof(float) == objType)
@@ -206,7 +227,6 @@ namespace cfeditor
         {
             m_id = id;
             m_parent = parent;
-            m_name = this.GetType().Name;
             m_canResize = canResize;
         }
 
@@ -223,6 +243,7 @@ namespace cfeditor
 
         public Rect position { get { return m_position; } }
         public Rect SetPosition { set { m_position = value; } }
+        public string SetName { set { m_name = value; } }
 
         public int childrenCount { get { return m_children.Count; } }
         public Node GetChild(int index)
@@ -274,7 +295,8 @@ namespace cfeditor
             if (m_canResize)
                 m_position = HorizResizer(m_position); //right
             //m_position = HorizResizer(m_position, false); //left
-            m_position = GUI.Window(m_id, m_position, OnDrawWindow, m_hasChanged ? m_name + "*" : m_name);
+            string name = m_name != null ? m_name : "";
+            m_position = GUI.Window(m_id, m_position, OnDrawWindow, m_hasChanged ? name + "*" : name);
         }
 
         public virtual void OnDrawGUI()
@@ -428,6 +450,8 @@ namespace cfeditor
 
         bool m_canResize;
         protected float m_heightStart;
+
+        public static ShowBehvCtrl Ctrl;
     }
 
 }

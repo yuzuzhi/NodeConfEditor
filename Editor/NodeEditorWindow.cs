@@ -108,6 +108,8 @@ namespace cfeditor
         {
             Self = GetWindow<NodeEditorWindow>();
             Self.Show(true);
+
+            Node.Ctrl = new SampShowBehvCtrl();
             //Self.m_assetObject = AssetDatabase.LoadAssetAtPath<ScriptableObject>("Assets/Editor/NodeEditor/sss.asset");
             //if (Self.m_assetObject != null)
             //{
@@ -198,12 +200,28 @@ namespace cfeditor
             }
            
         }
+
+        private static string[] classNames =
+        {
+            "TestClassConfObject",
+            "StudentConfObject",
+            "AutoDoorComponentConfObject",
+            "DoorClassConfObject",
+            "EntityTriggerComponentContentConfObject",
+            "EntityBranchContentConfObject",
+        };
         private void ProcessContextMenu(Vector2 mousePosition)
         {
             GenericMenu genericMenu = new GenericMenu();
-            genericMenu.AddItem(new GUIContent("TestClassConfObject"), false, () => OnClickAddListNode(mousePosition, "TestClassConfObject"));
-            genericMenu.AddItem(new GUIContent("StudentConfObject"), false, () => OnClickAddListNode(mousePosition, "StudentConfObject"));
-            genericMenu.AddItem(new GUIContent("AutoDoorComponentConfObject"), false, () => OnClickAddListNode(mousePosition, "AutoDoorComponentConfObject"));
+            for (int i = 0; i < classNames.Length; i++)
+            {
+                string name = classNames[i];
+                genericMenu.AddItem(new GUIContent(name), false,
+                    () => OnClickAddListNode(mousePosition, name));
+            }
+
+
+
             genericMenu.ShowAsContext();
         }
 
@@ -217,12 +235,12 @@ namespace cfeditor
             var assetObject = CreateInstance(t);
             var assetType = assetObject.GetType();
 
-            var guid = GUID.Generate();
-            assetType.GetField("ident").SetValue(assetObject, guid.ToString());
+            string guid = GUID.Generate().ToString();
+            assetType.GetField("ident").SetValue(assetObject, guid);
             var wnd = new ObjReferenceTypeNode(1, m_continer, assetObject);
             wnd.center = mousePosition;
             m_continer.add(wnd);
-            var fullPath = string.Format("{0}{1}.asset", Settings.Instance.confpath, name);
+            var fullPath = string.Format("{0}{1}.asset", Settings.Instance.confpath, guid);
             AssetDatabase.CreateAsset(assetObject, fullPath);
         }
 

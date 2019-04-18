@@ -6,25 +6,26 @@ using UnityEngine;
 
 namespace cfeditor
 {
-
-
     public class ObjReferenceTypeNode : TableTypeNode
     {
         public ObjReferenceTypeNode(int id, NodeContiner parent, ScriptableObject target) : base(id, parent, null)
         {
             Reset(target);
+            SetName = Ctrl.GetNodeTitle(m_target);
         }
 
         public void Reset(ScriptableObject target)
         {
-
+            SetName = "";
             m_sriptableObj = target;
             if (m_sriptableObj != null)
             {
-                base.m_target = m_sriptableObj.GetType().GetField("data").GetValue(m_sriptableObj);
+                var tarType = m_sriptableObj.GetType();
+                base.m_target = tarType.GetField("data").GetValue(m_sriptableObj);
                 foreach (var VARIABLE in m_childrenByField)
                     parent.remove(VARIABLE.Value.linkNode);
                 m_childrenByField.Clear();
+                SetName = tarType.GetField("name").GetValue(m_sriptableObj) as string;
             }
         }
 

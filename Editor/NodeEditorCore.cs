@@ -22,7 +22,7 @@ namespace cfeditor
         public List<string> fieldName;
         public List<List<ObjReference>> fieldValue;
     }
-
+    
     public class ListObject<T> : ScriptableObject
     {
         public List<T> data;
