@@ -399,7 +399,7 @@ namespace cfeditor
             return curvStart;
         }
 
-        protected void incconmmonheightpos()
+        protected void inccomnheightpos()
         {
             m_heightStart += kSingleLineHeight + EditorGUIUtility.standardVerticalSpacing;
         }

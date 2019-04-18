@@ -92,7 +92,7 @@ namespace cfeditor
                     };
 
                     EditorGUILayout.TextField(fieldInfo.Name, "List " + listValue.Count);
-                    incconmmonheightpos();
+                    inccomnheightpos();
                 }
                 else if (fieldInfo.IsObjReference())
                 {
@@ -114,7 +114,7 @@ namespace cfeditor
                     //r.width = rect.width - r.xMin - btnWid;
                     var newObj = EditorGUILayout.ObjectField(fieldInfo.Name,objref.target, typeof (ScriptableObject),
                         false);
-                    incconmmonheightpos();
+                    inccomnheightpos();
                     if (newObj != objref.target)
                     {
                         objref.target = newObj;
@@ -138,7 +138,7 @@ namespace cfeditor
                         }
                     };
                     EditorGUILayout.TextField(fieldInfo.Name, fieldInfo.FieldType.Name);
-                    incconmmonheightpos();
+                    inccomnheightpos();
                 }
 
 

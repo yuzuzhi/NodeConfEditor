@@ -64,7 +64,7 @@ namespace cfeditor
                     var objRefer = (ObjReference)listItemValue;
                     var strLabel = string.Format("[{0}]", i);
                     var newObj = EditorGUILayout.ObjectField(strLabel, objRefer.target, typeof (ScriptableObject), false);
-                    incconmmonheightpos();
+                    inccomnheightpos();
                     if (newObj != objRefer.target)
                     {
                         objRefer.target = newObj;
@@ -77,7 +77,7 @@ namespace cfeditor
                 else
                 {
                     GUILayout.Label(string.Format("[{0}]", i), GUILayout.Width(EditorGUIUtility.labelWidth));
-                    incconmmonheightpos();
+                    inccomnheightpos();
                     if (fieldLink.linkNode != null && fieldLink.linkNode.hasChanged)
                         SetChanged();
                 }
