@@ -225,6 +225,9 @@ namespace cfeditor
 
         public Node(int id, NodeContiner parent, bool canResize = false)
         {
+            if (Node.Ctrl == null)
+                Node.Ctrl = new ShowBehvCtrl();
+
             m_id = id;
             m_parent = parent;
             m_canResize = canResize;
