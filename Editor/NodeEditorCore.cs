@@ -8,7 +8,7 @@ namespace cfeditor
 {
     public partial class ConfScritableObject
     {
-        const string TableObject = "TableObject`1";
+        const string TableObject = "TableConfScritableObject`1";
 
         public static Type[] GetAllTypes()
         {
@@ -22,16 +22,15 @@ namespace cfeditor
     }
      public partial class ConfScritableObject: ScriptableObject
     {
-        
+        public string ident;
+        public string name;
     }
-    public class TableObject<T> : ConfScritableObject where T : new()
+    public class TableConfScritableObject<T> : ConfScritableObject where T : new()
     {
-        public TableObject()
+        public TableConfScritableObject()
         {
             data = new T();
         }
-        public string ident;
-        public string name;
         public T data;
         public List<ScriptableObject> localOjbects;
 
@@ -39,14 +38,6 @@ namespace cfeditor
         public List<List<ObjReference>> fieldValue;
     }
     
-    public class ListObject<T> : ScriptableObject
-    {
-        public List<T> data;
-    }
-
-    public class IntListObject: ListObject<int> { }
-    public class FloatListObject : ListObject<float> { }
-    public class StringListObject : ListObject<string> { }
 
     [Serializable]
     public struct ObjReference

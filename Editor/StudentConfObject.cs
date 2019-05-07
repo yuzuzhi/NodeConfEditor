@@ -5,10 +5,10 @@ using UnityEngine;
 
 namespace cfeditor.astdata
 {
-    public class StudentConfObject : TableObject<Student>
+    public class StudentConfObject : TableConfScritableObject<Student>
     {
     }
-    public class TestClassConfObject : TableObject<TestClass>
+    public class TestClassConfObject : TableConfScritableObject<TestClass>
     {
     }
 }

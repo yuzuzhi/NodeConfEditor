@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
@@ -106,7 +107,6 @@ namespace cfeditor
         [MenuItem("Window/ssss")]
         static void ddd()
         {
-            Self = GetWindow<NodeEditorWindow>();
             Self.Show(true);
 
             //Node.Ctrl = new SampShowBehvCtrl();
@@ -135,7 +135,8 @@ namespace cfeditor
                 //        tableTypeNode.OnGUI();
                 //}
                 Queue<Node> drawQueue = new Queue<Node>();
-                drawQueue.Enqueue(m_continer.GetByIndex(0));
+                for (int i = 0; i < m_continer.Count; ++i)
+                    drawQueue.Enqueue(m_continer.GetByIndex(i));
 
                 while (drawQueue.Count!=0)
                 {
@@ -231,21 +232,28 @@ namespace cfeditor
 
         private void OnClickAddListNode(Vector2 mousePosition, string name)
         {
-            var typesByName = GetClasses("cfeditor.astdata");
-            Type t;
-            if (!typesByName.TryGetValue(name, out t))
+            var allTypes = ConfScritableObject.GetAllTypes();
+            var listOfBs = (from filterType in allTypes
+                            where filterType.Name==name
+                            select filterType).ToArray();
+            if (listOfBs.Length == 0)
                 return;
-
-            var assetObject = CreateInstance(t);
+            
+            var assetObject = CreateInstance(listOfBs[0]);
             var assetType = assetObject.GetType();
 
             string guid = GUID.Generate().ToString();
             assetType.GetField("ident").SetValue(assetObject, guid);
-            var wnd = new ObjReferenceTypeNode(1, m_continer, assetObject);
-            wnd.center = mousePosition;
-            m_continer.add(wnd);
+            AddConfObject(assetObject as ConfScritableObject, mousePosition);
             var fullPath = string.Format("{0}{1}.asset", Settings.Instance.confpath, guid);
             AssetDatabase.CreateAsset(assetObject, fullPath);
+        }
+
+        public void AddConfObject(ConfScritableObject obj, Vector2 pos)
+        {
+            var wnd = new ObjReferenceTypeNode(1, m_continer, obj);
+            wnd.center = pos;
+            m_continer.add(wnd);
         }
 
         static Dictionary<string,Type> GetClasses(string nameSpace)
@@ -265,7 +273,17 @@ namespace cfeditor
 
 
         private NodeContiner m_continer = new NodeContiner();
-        private static NodeEditorWindow Self;
+
+        public static NodeEditorWindow Self
+        {
+            get
+            {
+                if(m_singleton==null)
+                    m_singleton = GetWindow<NodeEditorWindow>();
+                return m_singleton;
+            }
+        }
+        static NodeEditorWindow m_singleton = null;
 
     }
 }
