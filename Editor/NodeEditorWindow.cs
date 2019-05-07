@@ -114,7 +114,6 @@ namespace cfeditor
         {
             Self.Show(true);
 
-            Node.Ctrl = new SampShowBehvCtrl();
             //Self.m_assetObject = AssetDatabase.LoadAssetAtPath<ScriptableObject>("Assets/Editor/NodeEditor/sss.asset");
             //if (Self.m_assetObject != null)
             //{

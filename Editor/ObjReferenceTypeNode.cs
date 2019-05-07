@@ -25,6 +25,8 @@ namespace cfeditor
                     parent.remove(VARIABLE.Value.linkNode);
                 m_childrenByField.Clear();
                 SetName = tarType.GetField("name").GetValue(m_sriptableObj) as string;
+                if (string.IsNullOrEmpty(base.name))
+                    SetName = Ctrl.GetNodeTitle(base.target);
             }
         }
 

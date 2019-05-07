@@ -33,8 +33,10 @@ namespace cfeditor
         {
             if(btnOpen)
             {
-                NodeEditorWindow.Self.AddConfObject(target as ConfScritableObject, new Vector2(100, 100));
+                Node.Ctrl = new SampShowBehvCtrl();
+                NodeEditorWindow.Self.AddConfObject(target as ConfScritableObject, new Vector2(300, 100));
                 NodeEditorWindow.Self.Repaint();
+
             }
         }
 

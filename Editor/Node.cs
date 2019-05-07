@@ -247,6 +247,7 @@ namespace cfeditor
         public Rect position { get { return m_position; } }
         public Rect SetPosition { set { m_position = value; } }
         public string SetName { set { m_name = value; } }
+        public string name { get { return m_name; } }
 
         public int childrenCount { get { return m_children.Count; } }
         public Node GetChild(int index)
