@@ -1,14 +1,30 @@
 ﻿using System;
-using System.Collections;
+using System.Linq;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
 
 namespace cfeditor
 {
-    
-    public class TableObject<T> : ScriptableObject where T : new()
+    public partial class ConfScritableObject
+    {
+        const string TableObject = "TableObject`1";
+
+        public static Type[] GetAllTypes()
+        {
+            var t = typeof(ConfScritableObject);
+            var ass = t.Assembly.GetTypes();
+            var listOfBs = (from assemblyType in ass
+                            where t.IsAssignableFrom(assemblyType) && assemblyType.Name != TableObject && assemblyType != t
+                            select assemblyType).ToArray();
+            return listOfBs;
+        }
+    }
+     public partial class ConfScritableObject: ScriptableObject
+    {
+        
+    }
+    public class TableObject<T> : ConfScritableObject where T : new()
     {
         public TableObject()
         {

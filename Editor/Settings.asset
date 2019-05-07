@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 943d2bfff4f75404d84db1192b925809, type: 3}
+  m_Script: {fileID: 11500000, guid: e978c242a6751ac47882cd3fd717cf2e, type: 3}
   m_Name: Settings
   m_EditorClassIdentifier: 
-  confpath: Assets\3rd\cfeditor\trunk\Editor\Data\
+  confpath: Assets\cfeditor\trunk\Editor\Data\

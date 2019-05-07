@@ -109,7 +109,7 @@ namespace cfeditor
             Self = GetWindow<NodeEditorWindow>();
             Self.Show(true);
 
-            Node.Ctrl = new SampShowBehvCtrl();
+            //Node.Ctrl = new SampShowBehvCtrl();
             //Self.m_assetObject = AssetDatabase.LoadAssetAtPath<ScriptableObject>("Assets/Editor/NodeEditor/sss.asset");
             //if (Self.m_assetObject != null)
             //{
@@ -117,7 +117,7 @@ namespace cfeditor
             //    Self.nodeWnd.Add(new TableTypeNode(1, Self, data));
             //}
         }
-
+        int selectedWindow;
         void OnGUI()
         {
             m_continer.window = this;
@@ -201,15 +201,19 @@ namespace cfeditor
            
         }
 
-        private static string[] classNames =
+        private static string[] classNames
         {
-            "TestClassConfObject",
-            "StudentConfObject",
-            "AutoDoorComponentConfObject",
-            "DoorClassConfObject",
-            "EntityTriggerComponentContentConfObject",
-            "EntityBranchContentConfObject",
-        };
+            get
+            {
+                var allTypes = ConfScritableObject.GetAllTypes();
+                List<string> nameList = new List<string>();
+                for(int i=0; i<allTypes.Length;++i)
+                {
+                    nameList.Add(allTypes[i].Name);
+                }
+                return nameList.ToArray();
+            }
+        }
         private void ProcessContextMenu(Vector2 mousePosition)
         {
             GenericMenu genericMenu = new GenericMenu();
