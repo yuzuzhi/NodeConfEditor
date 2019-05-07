@@ -11,7 +11,6 @@ namespace cfeditor
         public ObjReferenceTypeNode(int id, NodeContiner parent, ScriptableObject target) : base(id, parent, null)
         {
             Reset(target);
-            SetName = Ctrl.GetNodeTitle(m_target);
         }
 
         public void Reset(ScriptableObject target)

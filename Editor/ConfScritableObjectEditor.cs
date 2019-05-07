@@ -34,7 +34,7 @@ namespace cfeditor
             if(btnOpen)
             {
                 NodeEditorWindow.Self.AddConfObject(target as ConfScritableObject, new Vector2(100, 100));
-                NodeEditorWindow.Self.Show();
+                NodeEditorWindow.Self.Repaint();
             }
         }
 

@@ -55,7 +55,6 @@ namespace cfeditor
                         fieldLink.linkNode.SetPosition = ReCalcuChildPos(fieldLink.linkNode.position, curvStart);
                         this.AddChild(fieldLink.linkNode);
                         draw.endNode = fieldLink.linkNode;
-                        parent.add(fieldLink.linkNode);
                     }
                 });
 

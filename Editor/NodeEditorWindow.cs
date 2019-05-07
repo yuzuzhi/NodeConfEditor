@@ -30,6 +30,11 @@ namespace cfeditor
             return m_nodeList[i];
         }
 
+        public void clear()
+        {
+            m_nodeList.Clear();
+        }
+
         public void add(Node n)
         {
             m_nodeList.Add(n);
@@ -109,7 +114,7 @@ namespace cfeditor
         {
             Self.Show(true);
 
-            //Node.Ctrl = new SampShowBehvCtrl();
+            Node.Ctrl = new SampShowBehvCtrl();
             //Self.m_assetObject = AssetDatabase.LoadAssetAtPath<ScriptableObject>("Assets/Editor/NodeEditor/sss.asset");
             //if (Self.m_assetObject != null)
             //{
@@ -251,6 +256,7 @@ namespace cfeditor
 
         public void AddConfObject(ConfScritableObject obj, Vector2 pos)
         {
+            m_continer.clear();
             var wnd = new ObjReferenceTypeNode(1, m_continer, obj);
             wnd.center = pos;
             m_continer.add(wnd);
@@ -278,8 +284,11 @@ namespace cfeditor
         {
             get
             {
-                if(m_singleton==null)
+                if (m_singleton == null)
+                {
                     m_singleton = GetWindow<NodeEditorWindow>();
+                    m_singleton.Show();
+                }
                 return m_singleton;
             }
         }

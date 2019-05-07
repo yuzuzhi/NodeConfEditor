@@ -22,7 +22,7 @@ namespace cfeditor
 
         public virtual string GetNodeTitle(object target)
         {
-            return "";
+            return target == null ? "null" : "";
         }
     }
     
