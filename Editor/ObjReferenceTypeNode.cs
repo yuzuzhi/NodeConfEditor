@@ -8,12 +8,12 @@ namespace cfeditor
 {
     public class ObjReferenceTypeNode : TableTypeNode
     {
-        public ObjReferenceTypeNode(int id, NodeContiner parent, ScriptableObject target) : base(id, parent, null)
+        public ObjReferenceTypeNode(int id, NodeContiner parent, ConfScritableObject target) : base(id, parent, null)
         {
             Reset(target);
         }
 
-        public void Reset(ScriptableObject target)
+        public void Reset(ConfScritableObject target)
         {
             SetName = "";
             m_sriptableObj = target;
@@ -24,7 +24,7 @@ namespace cfeditor
                 foreach (var VARIABLE in m_childrenByField)
                     parent.remove(VARIABLE.Value.linkNode);
                 m_childrenByField.Clear();
-                SetName = tarType.GetField("name").GetValue(m_sriptableObj) as string;
+                SetName = m_sriptableObj.name;
                 if (string.IsNullOrEmpty(base.name))
                     SetName = Ctrl.GetNodeTitle(base.target);
             }
@@ -53,6 +53,6 @@ namespace cfeditor
         }
 
 
-        ScriptableObject m_sriptableObj;
+        ConfScritableObject m_sriptableObj;
     }
 }

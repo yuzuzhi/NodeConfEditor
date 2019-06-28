@@ -110,7 +110,7 @@ namespace cfeditor
                         if (fieldLink.linkNode == null)
                         {
                             fieldLink.linkNode = new ObjReferenceTypeNode(increasingIdent++, parent,
-                                (ScriptableObject) objref.target);
+                                (ConfScritableObject) objref.target);
                             fieldLink.linkNode.SetPosition = ReCalcuChildPos(fieldLink.linkNode.position, curvStart);
                             this.AddChild(fieldLink.linkNode);
                             draw.endNode = fieldLink.linkNode;
@@ -118,7 +118,7 @@ namespace cfeditor
                     };
                     //r.xMin = EditorGUIUtility.labelWidth;
                     //r.width = rect.width - r.xMin - btnWid;
-                    var newObj = EditorGUILayout.ObjectField(label,objref.target, typeof (ScriptableObject),
+                    var newObj = EditorGUILayout.ObjectField(label,objref.target, typeof (ConfScritableObject),
                         false);
                     inccomnheightpos();
                     if (newObj != objref.target)
@@ -126,7 +126,7 @@ namespace cfeditor
                         objref.target = newObj;
                         fieldInfo.SetValue(m_target, objref);
                         if (fieldLink.linkNode != null)
-                            ((ObjReferenceTypeNode) fieldLink.linkNode).Reset((ScriptableObject) objref.target);
+                            ((ObjReferenceTypeNode) fieldLink.linkNode).Reset((ConfScritableObject) objref.target);
                         SetChanged();
                     }
                 }
@@ -142,7 +142,13 @@ namespace cfeditor
                             draw.endNode = fieldLink.linkNode;
                         }
                     };
-                    EditorGUILayout.TextField(label, fieldInfo.FieldType.Name);
+                    if (Ctrl.IsDynField(m_target, fieldInfo))
+                    {
+                        var typeList = Ctrl.DynTypeList(m_target, fieldInfo);
+                        var nameList = Ctrl.toNameList(typeList);                        
+                    }
+                    else
+                        EditorGUILayout.TextField(label, fieldInfo.FieldType.Name);
                     inccomnheightpos();
                 }
 

@@ -48,7 +48,7 @@ namespace cfeditor
                         {
                             var objRefer = (ObjReference) listItemValue;
                             fieldLink.linkNode = new ObjReferenceTypeNode(increasingIdent++, parent,
-                                (ScriptableObject) objRefer.target);
+                                (ConfScritableObject) objRefer.target);
                         }
                         else
                             fieldLink.linkNode = new TableTypeNode(increasingIdent++, parent, listItemValue);
@@ -69,7 +69,7 @@ namespace cfeditor
                         objRefer.target = newObj;
                         m_target[i] = objRefer;
                         if (fieldLink.linkNode != null)
-                            ((ObjReferenceTypeNode)fieldLink.linkNode).Reset((ScriptableObject)objRefer.target);
+                            ((ObjReferenceTypeNode)fieldLink.linkNode).Reset((ConfScritableObject)objRefer.target);
                         SetChanged();
                     }
                 }

@@ -171,6 +171,22 @@ namespace cfeditor
             return false;
         }
 
+        //void DrawTypeSelector(Type[] dynTypes)
+        //{
+        //    if (dynTypes != null && dynTypes.Length != 0)
+        //    {
+        //        int oldTypeIndex = target != null ? typeIndex(target.GetType(), dynTypes) : -1;
+        //        string[] typeNameList = toNameList(dynTypes);
+        //        int newTypeIndex = EditorGUILayout.Popup("selfType", oldTypeIndex, typeNameList);
+        //        if (newTypeIndex < 0) newTypeIndex = 0;
+        //        if (newTypeIndex != oldTypeIndex)
+        //        {
+        //            target = Activator.CreateInstance(dynTypes[newTypeIndex]);
+        //            hasChanged = true;
+        //        }
+        //    }
+        //}
+
 
         public static Rect ResizeWindow(Rect windowRect, ref bool isResizing, ref Rect resizeStart,
             Vector2 minWindowSize)
